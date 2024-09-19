@@ -8,12 +8,12 @@ Run the following command to install dependencies and set up Python:
 `venv\Scripts\activate`
 `pip install -r requirements.txt`
 
-# Run Code
 Run the following command to install dependencies and set up Playwright:
 
 `npm init playwright@latest`
 `npm install @axe-core/playwright`
 
+# Run Code
 Now run the following line to set up the Open AI API Key:
 
 * Mac/Linux:
@@ -22,4 +22,4 @@ Now run the following line to set up the Open AI API Key:
 * Windows:
 ```set OPENAI_API_KEY=<insert API key>```
 
-Run **clean_gpt_models.py**
+Run **currentTool.py**
