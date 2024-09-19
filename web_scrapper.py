@@ -17,6 +17,6 @@ def fetch_and_save_data(url, path):
         with open(path, 'w', encoding='utf-8') as f:
             f.write(soup.prettify())
         
-        print(f"The entire HTML content has been saved to {path}")
+        print(f"HTML content has been saved to {path}")
     else:
         print(f"Failed to retrieve the webpage. Status code: {response.status_code}")

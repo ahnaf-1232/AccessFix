@@ -7,3 +7,7 @@ node_modules/
 data
 venv
 .env
+__pycache__
+tests
+num_violations.txt
+violationsWithFixedContent.csv

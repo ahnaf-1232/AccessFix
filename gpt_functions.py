@@ -16,7 +16,7 @@ class GPTFunctions:
 
     # function to get responses given system and user messages
     def GPT_response(self, system, user):
-        print("\n...................................... new call ...............................................")
+        # print("\n...................................... new call ...............................................")
         # print(user)
         response = openai.chat.completions.create(
             model='gpt-3.5-turbo-16k',
