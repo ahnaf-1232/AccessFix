@@ -1,7 +1,7 @@
 # DOM-Accessibility
 Correcting website accessibility violations using LLMs
 
-# Setup python
+# Setup
 Run the following command to install dependencies and set up Python:
 
 `python -m venv venv`

@@ -6,7 +6,7 @@ import glob
 import subprocess
 import openai
 from dotenv import load_dotenv
-from gpt_functions import GPTFunctions
+from gemma_functions import GemmaFunctions
 from web_scrapper import fetch_and_save_data
 
 
@@ -29,7 +29,7 @@ def run_playwright_test():
 class CleanGPTModels:
     def __init__(self):
         load_dotenv()
-        self.gpt_functions = GPTFunctions()
+        self.gpt_functions = GemmaFunctions()
         openai.api_key = os.getenv('OPENAI_API_KEY')
 
         if not os.path.exists('violationsWithFixedContent.csv'):
