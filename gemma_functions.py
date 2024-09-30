@@ -1,41 +1,30 @@
 import os
-import torch
-from transformers import pipeline
 import pandas as pd
 import re
+import ollama
 
 class GemmaFunctions:
     def __init__(self):
-        # Check if the CSV exists; if not, create it
         if not os.path.exists('violationsWithFixedContent.csv'):
             with open('violationsWithFixedContent.csv', 'w') as file:
                 file.write('id,impact,tags,description,help,helpUrl,nodeImpact,nodeHtml,nodeTarget,nodeType,message,numViolation\n')
         self.df = pd.read_csv('violationsWithFixedContent.csv')
 
-        # Initialize the Gemma pipeline
-        self.pipe = pipeline(
-            "text-generation",
-            model="google/gemma-2-2b-it",
-            model_kwargs={"torch_dtype": torch.bfloat16},
-            # device="cuda"  # Uncomment if running on GPU
-        )
+    def GPT_response(self, system, user, row_index):
+        print(f"\n...................................... Call : {row_index}...............................................")
 
-    # Function to get responses from the Gemma model given system and user messages
-    def GPT_response(self, system, user):
-        # Combine system and user messages into a single prompt for Gemma
-        print("\n...................................... new call ...............................................")
-      
-        prompt = f"{system}\n\n{user}"
-        # Use the pipeline to generate text based on the prompt
-        outputs = self.pipe(prompt, max_new_tokens=128)
-        # Extract the generated text
-        # response = outputs[0]["generated_text"][-1]["content"].strip()
-        response = outputs[0]["generated_text"].strip()
-        return response
+        # Format the prompt as a list of messages
+        prompt = [
+            {"role": "system", "content": system},
+            {"role": "user", "content": user}
+        ]
 
-    """BASELINE ReAct Prompt"""
+        response = ollama.chat(model='gemma2:2b', messages=prompt)
+        content = response['message']['content']
+    
+        return content
 
-    # Function returns system message and user message for a given row index of the dataframe
+
     def generate_prompt(self, row_index):
         system_msg = """You are an assistant who will correct web accessibility issues of a provided website.
                 I will provide you with an incorrect line of HTML. Provide a correction.
@@ -58,23 +47,22 @@ class GemmaFunctions:
                 Correct: [['<div id="accessibilityHome" role="navigation">\n<a aria-label="Accessibility overview" href="https://explore.zoom.us/en/accessibility">Accessibility Overview</a>\n</div>']]"""
 
         user_msg = f"""
-        Error: {self.df['id'][row_index]}
-        Description: {self.df['description'][row_index]}
-        Suggested change: {self.df['help'][row_index]}
+        Provide a correction for the following. Do not add anything else in the response.
 
-        Incorrect: {self.df['nodeHtml'][row_index]}"""
+        Incorrect: {self.df['nodeHtml'][row_index]}
+        Issue: {self.df['description'][row_index]}
+"""
         return system_msg, user_msg
-
-    """Function for getting GPT corrections"""
 
     # Function returns the corrected part of the Gemma response
     def get_correction(self, row_index):
         # Obtain response from Gemma by calling prompt generation and chat functions
         system_msg = self.generate_prompt(row_index)[0]
         user_msg = self.generate_prompt(row_index)[1]
-        response = self.GPT_response(system_msg, user_msg)
+        response = self.GPT_response(system_msg, user_msg,row_index)
 
         # Extract the "correct" part using regex
+        print(response)
         correct_headers = re.search(r"Correct:\s*(\[\[.*\]\])", response)
         if correct_headers:
             return correct_headers.group(1)

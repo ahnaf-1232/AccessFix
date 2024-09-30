@@ -7,6 +7,7 @@ import subprocess
 import openai
 from dotenv import load_dotenv
 from gemma_functions import GemmaFunctions
+from gpt_functions import GPTFunctions
 from web_scrapper import fetch_and_save_data
 
 
