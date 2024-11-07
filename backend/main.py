@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Any
 import logging
-from currentTool import analyze
+from fixation import analyze
 
 app = FastAPI()
 

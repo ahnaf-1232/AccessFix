@@ -38,7 +38,8 @@ export class HomeComponent {
     } else if (this.url) {
       this.codeAnalysisService.analyzeUrl(this.url).subscribe(
         response => {
-          this.report = response;
+          this.report = JSON.stringify(response, null, 2);
+          console.log(this.report);
           this.clearFields();
           this.loading = false;
         },

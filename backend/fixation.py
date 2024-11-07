@@ -5,6 +5,7 @@ import time
 import glob
 import subprocess
 import openai
+import numpy as np
 from dotenv import load_dotenv
 from gemma_functions import GemmaFunctions
 from web_scrapper import fetch_and_save_data
@@ -260,11 +261,17 @@ class CleanGPTModels:
         total_final_severity_score = self.calculate_severity_score(result_df, 'finalScore')
         total_improvement = ((1 - (total_final_severity_score / total_initial_severity_score)) * 100)
 
+
+        print(f"Total initial severity score: {total_initial_severity_score}")
+        print(f"Total final severity score: {total_final_severity_score}")
+        print(f"Total improvement: {total_improvement}")
+        # print(result_df)
+
         return {
-            "total_initial_severity_score": total_initial_severity_score,
-            "total_final_severity_score": total_final_severity_score,
-            "total_improvement": total_improvement,
-            "result_df": result_df.to_dict()
+            "total_initial_severity_score": int(total_initial_severity_score) if isinstance(total_initial_severity_score, np.integer) else total_initial_severity_score,
+            "total_final_severity_score": int(total_final_severity_score) if isinstance(total_final_severity_score, np.integer) else total_final_severity_score,
+            "total_improvement": float(total_improvement) if isinstance(total_improvement, (np.integer, np.floating)) else total_improvement,
+            # "result_df": result_df.to_dict()
         }
 
 
