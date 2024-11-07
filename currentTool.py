@@ -86,8 +86,11 @@ class CleanGPTModels:
             except OSError as e:
                 print(f"Error while removing file '{file_path}': {e}")
 
-    def create_test_script(self, url):   
+    def create_test_script(self, url, path):   
         print("Creating the violation file...........")
+
+        with open(path, 'r', encoding='utf-8') as text_file:
+            dom = text_file.read()
 
         test_script_path = "./tests/before.spec.ts"
         with open(test_script_path, "w", encoding='utf-8') as f:
@@ -143,7 +146,7 @@ class CleanGPTModels:
                 }}
 
                 test('accessibility issues', async ({{ page }}) => {{
-                    await page.goto("{url}");
+                    await page.setContent(`{dom}`);
                     const accessibilityScanResults = await new AxeBuilder({{ page }}).analyze();
                     const violations = accessibilityScanResults.violations;
 
@@ -167,7 +170,7 @@ class CleanGPTModels:
                 os.remove('num_violations.txt')        
 
 
-    def corrections2violations(self, url, corrected_dom):
+    def corrections2violations(self, corrected_dom):
         test_script_path = "./tests/after.spec.ts"
         with open(test_script_path, "w", encoding='utf-8') as f:
             f.write(f"""
@@ -177,7 +180,6 @@ class CleanGPTModels:
             const fileReader = require('fs');
 
             test('all violations', async ({{ page }}) => {{
-                await page.goto("{url}");
                 await page.setContent(`{corrected_dom}`)
                 const accessibilityScanResults = await new AxeBuilder({{ page }}).analyze();
                 const violations = accessibilityScanResults.violations;
@@ -246,7 +248,7 @@ class CleanGPTModels:
         df_corrections = pd.DataFrame()
         dom_corrected = self.input_df.iloc[0]['DOMCorrected']
         # print("checking", url)
-        df_temp = self.corrections2violations(url, dom_corrected)
+        df_temp = self.corrections2violations(dom_corrected)
         df_corrections = pd.concat([df_corrections, df_temp])
         df_corrections.to_csv('correctionViolations.csv', index=False)
         return df_corrections
@@ -261,7 +263,7 @@ def main():
     fetch_and_save_data(url, path)  # web scrape
 
     model = CleanGPTModels()
-    model.create_test_script(url)   # find violations
+    model.create_test_script(url,path)   # find violations
 
 
     model.input_df = model.add_severity_score(model.input_df, 'initialScore', 5)

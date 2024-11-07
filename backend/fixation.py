@@ -76,9 +76,11 @@ class CleanGPTModels:
             except OSError as e:
                 print(f"Error while removing file '{file_path}': {e}")
 
-
-    def create_test_script(self, url):   
+    def create_test_script(self, path):   
         print("Creating the violation file...........")
+
+        with open(path, 'r', encoding='utf-8') as text_file:
+            dom = text_file.read()
 
         test_script_path = "./tests/before.spec.ts"
         with open(test_script_path, "w", encoding='utf-8') as f:
@@ -134,7 +136,7 @@ class CleanGPTModels:
                 }}
 
                 test('accessibility issues', async ({{ page }}) => {{
-                    await page.goto("{url}");
+                    await page.setContent(`{dom}`);
                     const accessibilityScanResults = await new AxeBuilder({{ page }}).analyze();
                     const violations = accessibilityScanResults.violations;
 
@@ -157,8 +159,7 @@ class CleanGPTModels:
                 time.sleep(1)
                 os.remove('num_violations.txt')        
 
-
-    def corrections2violations(self, url, corrected_dom):
+    def generate_violation_report_from_content(self, corrected_dom):
         test_script_path = "./tests/after.spec.ts"
         with open(test_script_path, "w", encoding='utf-8') as f:
             f.write(f"""
@@ -168,7 +169,6 @@ class CleanGPTModels:
             const fileReader = require('fs');
 
             test('all violations', async ({{ page }}) => {{
-                await page.goto("{url}");
                 await page.setContent(`{corrected_dom}`)
                 const accessibilityScanResults = await new AxeBuilder({{ page }}).analyze();
                 const violations = accessibilityScanResults.violations;
@@ -239,7 +239,7 @@ class CleanGPTModels:
         df_corrections = pd.DataFrame()
         dom_corrected = self.input_df.iloc[0]['DOMCorrected']
         # print("checking", url)
-        df_temp = self.corrections2violations(url, dom_corrected)
+        df_temp = self.generate_violation_report_from_content(dom_corrected)
         df_corrections = pd.concat([df_corrections, df_temp])
         df_corrections.to_csv('correctionViolations.csv', index=False)
         return df_corrections
@@ -247,7 +247,7 @@ class CleanGPTModels:
 
     def analyze_violations(self, url, path):
         fetch_and_save_data(url, path)
-        self.create_test_script(url)
+        self.create_test_script(url, path)
         self.input_df = self.add_severity_score(self.input_df, 'initialScore', 5)
         
         print("total # of violations: ", len(self.input_df))
@@ -256,7 +256,7 @@ class CleanGPTModels:
         self.create_corrected_dom_column(path)
         
         dom_corrected = self.input_df.iloc[0]['DOMCorrected']
-        result_df = self.corrections2violations(url, dom_corrected)
+        result_df = self.generate_violation_report_from_content(url, dom_corrected)
        
         total_final_severity_score = self.calculate_severity_score(result_df, 'finalScore')
         total_improvement = ((1 - (total_final_severity_score / total_initial_severity_score)) * 100)
