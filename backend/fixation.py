@@ -1,14 +1,14 @@
+import io
 import pandas as pd
 import os
 import time
 import glob
 import subprocess
 import numpy as np
-from docx import Document
-import fitz
 from dotenv import load_dotenv
 from LLM_functions import LLMFunctions
 from web_scrapper import fetch_and_save_data, save_code_to_path
+from file_handler import extract_text_from_pdf, extract_text_from_docx, extract_text_from_html
 
 
 def run_playwright_test():
@@ -243,38 +243,6 @@ class CleanGPTModels:
         df_corrections.to_csv('correctionViolations.csv', index=False)
         return df_corrections
 
-    def extract_text_from_pdf(self, file_bytes):
-        text = ""
-        with fitz.open(stream=file_bytes, filetype="pdf") as pdf:
-            for page in pdf:
-                text += page.get_text()
-        return text
-
-    def extract_text_from_docx(self, file_bytes):
-        text = ""
-        doc = Document(io.BytesIO(file_bytes))
-        for paragraph in doc.paragraphs:
-            text += paragraph.text + "\n"
-        return text
-
-    def analyze_violations_from_file(self, file, path):
-        try:
-            file_content = file.read()
-            if file.filename.endswith(".pdf"):
-                code = self.extract_text_from_pdf(file_content)
-            elif file.filename.endswith(".docx"):
-                code = self.extract_text_from_docx(file_content)
-            else:
-                raise ValueError("Unsupported file format")
-
-            return self.analyze_violations_from_code(code, path)
-
-        except Exception as e:
-            print(f"Error processing file: {e}")
-            raise ValueError("Failed to process file content")
-
-
-
 
     def analyze_violations_from_URL(self, url, path):
         fetch_and_save_data(url, path)
@@ -336,14 +304,39 @@ class CleanGPTModels:
         }
 
 
+    def analyze_violations_from_file(self, file, path):
+        try:
+            file_content = file.read()
+            if file.filename.endswith(".pdf"):
+                code = extract_text_from_pdf(file_content)
+            elif file.filename.endswith(".docx"):
+                code = extract_text_from_docx(file_content)
+            elif file.filename.endswith(".html"):
+                code = extract_text_from_html(file_content)
+            else:
+                raise ValueError("Unsupported file format")
+
+            return self.analyze_violations_from_code(code, path)
+
+        except Exception as e:
+            print(f"Error processing file: {e}")
+            raise ValueError("Failed to process file content")
+
+
+
 def analyzeURL(url: str):
     model = CleanGPTModels()
     path = 'data/input.html'
     return model.analyze_violations_from_URL(url, path)
 
 
-
 def analyzeCode(code: str):
     model = CleanGPTModels()
     path = 'data/input.html'
     return model.analyze_violations_from_code(code, path)
+
+
+def analyzeCodeFromFile(file):
+    model = CleanGPTModels()
+    path = 'data/input.html'
+    return model.analyze_violations_from_file(file, path)
