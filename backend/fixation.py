@@ -1,5 +1,6 @@
 import io
 import pandas as pd
+import asyncio
 import os
 import time
 import glob
@@ -50,6 +51,12 @@ class CleanGPTModels:
 
     def create_corrected_dom_column(self, path):
         print("Correcting DOMs..........")
+
+        if self.input_df.empty:
+            print("No violations found; skipping DOM correction.")
+            self.final_corrected_dom = None
+            return
+            
         error_fix_dict = {}
 
         with open(path, 'r', encoding='utf-8') as text_file:
@@ -65,6 +72,14 @@ class CleanGPTModels:
             dom_corrected = dom_corrected.replace(error[3:-3], fix[3:-3])
 
         self.input_df['DOMCorrected'] = dom_corrected
+        self.final_corrected_dom = dom_corrected
+
+        corrected_path = path.replace(".html", "_corrected.html")
+        with open(corrected_path, 'w', encoding='utf-8') as corrected_file:
+            corrected_file.write(dom_corrected)
+
+        print(f"Final corrected DOM saved to {corrected_path}")
+
 
     def remove_files_starting_with(self, pattern):
         files_to_remove = glob.glob(pattern)
@@ -158,7 +173,7 @@ class CleanGPTModels:
                 time.sleep(1)
                 os.remove('num_of_violations.txt')        
 
-    def generate_violation_report_from_content(self, corrected_dom):
+    def correction_to_violations(self, corrected_dom):
         test_script_path = "./tests/after.spec.ts"
         with open(test_script_path, "w", encoding='utf-8') as f:
             f.write(f"""
@@ -233,15 +248,16 @@ class CleanGPTModels:
         new_df = self.add_severity_score(new_df, 'finalScore', 3)
         return new_df
 
-    def call_corrections2violations(self, url):
+    def call_corrections_to_violations(self, url):
         print("Violation result after corrections.....")
         df_corrections = pd.DataFrame()
         dom_corrected = self.input_df.iloc[0]['DOMCorrected']
 
-        df_temp = self.generate_violation_report_from_content(dom_corrected)
+        df_temp = self.correction_to_violations(dom_corrected)
         df_corrections = pd.concat([df_corrections, df_temp])
         df_corrections.to_csv('correctionViolations.csv', index=False)
         return df_corrections
+
 
 
     def analyze_violations_from_URL(self, url, path):
@@ -255,7 +271,7 @@ class CleanGPTModels:
         self.create_corrected_dom_column(path)
         
         dom_corrected = self.input_df.iloc[0]['DOMCorrected']
-        result_df = self.generate_violation_report_from_content(dom_corrected)
+        result_df = self.correction_to_violations(dom_corrected)
        
         total_final_severity_score = self.calculate_severity_score(result_df, 'finalScore')
         total_improvement = ((1 - (total_final_severity_score / total_initial_severity_score)) * 100)
@@ -285,7 +301,7 @@ class CleanGPTModels:
         self.create_corrected_dom_column(path)
         
         dom_corrected = self.input_df.iloc[0]['DOMCorrected']
-        result_df = self.generate_violation_report_from_content(dom_corrected)
+        result_df = self.correction_to_violations(dom_corrected)
        
         total_final_severity_score = self.calculate_severity_score(result_df, 'finalScore')
         total_improvement = ((1 - (total_final_severity_score / total_initial_severity_score)) * 100)
@@ -304,11 +320,14 @@ class CleanGPTModels:
         }
 
 
-    def analyze_violations_from_file(self, file, path):
+    async def analyze_violations_from_file(self, file, path):
         try:
-            file_content = file.read()
+            # Asynchronously read file content
+            file_content = await file.read()
+
+            # Check the file type and extract text accordingly
             if file.filename.endswith(".pdf"):
-                code = extract_text_from_pdf(file_content)
+                code = extract_text_from_pdf(file_content)  # Ensure this function can handle bytes input
             elif file.filename.endswith(".docx"):
                 code = extract_text_from_docx(file_content)
             elif file.filename.endswith(".html"):
@@ -316,6 +335,7 @@ class CleanGPTModels:
             else:
                 raise ValueError("Unsupported file format")
 
+            # Analyze the extracted code
             return self.analyze_violations_from_code(code, path)
 
         except Exception as e:
