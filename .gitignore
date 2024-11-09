@@ -5,6 +5,7 @@ node_modules/
 /playwright/.cache/
 
 data
+myenv
 venv
 .env
 __pycache__

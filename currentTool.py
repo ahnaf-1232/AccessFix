@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from ollama_functions import LLMFunctions
 from gemma_functions import GemmaFunctions
 from gpt_functions import GPTFunctions
-from web_scrapper import fetch_and_save_data
+from web_scrapper_and_file_handler import fetch_and_save_data
 
 
 def run_playwright_test():

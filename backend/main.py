@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Any
 import logging
-from fixation import analyze
+from fixation import analyzeURL, analyzeCode
 
 app = FastAPI()
 
@@ -32,7 +32,7 @@ class FileAnalysisRequest(BaseModel):
 async def analyze_code(request: CodeAnalysisRequest):
     try:
         logging.info(f"Received code for analysis: {request.code}")
-        result = analyze(request.code)
+        result = analyzeCode(request.code)
         return result
     except Exception as e:
         logging.error(f"Error analyzing code: {e}")
@@ -42,7 +42,7 @@ async def analyze_code(request: CodeAnalysisRequest):
 async def analyze_url(request: UrlAnalysisRequest) -> Any:
     try:
         logging.info(f"Received URL for analysis: {request.url}")
-        result = analyze(request.url)
+        result = analyzeURL(request.url)
         return result
     except Exception as e:
         logging.error(f"Error analyzing URL: {e}")
@@ -52,7 +52,7 @@ async def analyze_url(request: UrlAnalysisRequest) -> Any:
 async def analyze_file(request: FileAnalysisRequest):
     try:
         logging.info(f"Received file content for analysis: {request.content}")
-        result = analyze(request.content)
+        result = analyzeCode(request.content)
         return result
     except Exception as e:
         logging.error(f"Error analyzing file content: {e}")

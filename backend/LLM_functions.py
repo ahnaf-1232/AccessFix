@@ -3,12 +3,12 @@ import pandas as pd
 import re
 import ollama
 
-class GemmaFunctions:
+class LLMFunctions:
     def __init__(self):
-        if not os.path.exists('violationsWithFixedContent.csv'):
-            with open('violationsWithFixedContent.csv', 'w') as file:
+        if not os.path.exists('violationResult.csv'):
+            with open('violationResult.csv', 'w') as file:
                 file.write('id,impact,tags,description,help,helpUrl,nodeImpact,nodeHtml,nodeTarget,nodeType,message,numViolation\n')
-        self.df = pd.read_csv('violationsWithFixedContent.csv')
+        self.df = pd.read_csv('violationResult.csv')
 
     def LLM_response(self, system, user, row_index):
         print(f"\n...................................... Call : {row_index}...............................................")
@@ -18,7 +18,7 @@ class GemmaFunctions:
             {"role": "user", "content": user}
         ]
 
-        response = ollama.chat(model='gemma2:2b', messages=prompt)
+        response = ollama.chat(model='codegemma:latest', messages=prompt)
         content = response['message']['content']
     
         return content
@@ -70,4 +70,4 @@ class GemmaFunctions:
             return self.df['nodeHtml'][row_index]
 
 # Instantiate the class and use it
-gpt_functions = GemmaFunctions()
+gpt_functions = LLMFunctions()

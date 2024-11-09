@@ -26,7 +26,7 @@ export class HomeComponent {
     if (this.code) {
       this.codeAnalysisService.analyzeCode(this.code).subscribe(
         response => {
-          this.report = response;
+          this.report = JSON.stringify(response, null, 2);
           this.clearFields();
           this.loading = false;
         },
@@ -39,7 +39,6 @@ export class HomeComponent {
       this.codeAnalysisService.analyzeUrl(this.url).subscribe(
         response => {
           this.report = JSON.stringify(response, null, 2);
-          console.log(this.report);
           this.clearFields();
           this.loading = false;
         },
@@ -51,7 +50,7 @@ export class HomeComponent {
     } else if (this.fileContent) {
       this.codeAnalysisService.analyzeFile(this.fileContent).subscribe(
         response => {
-          this.report = response;
+          this.report = JSON.stringify(response, null, 2);
           this.clearFields();
           this.loading = false;
         },

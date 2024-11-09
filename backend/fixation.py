@@ -1,14 +1,14 @@
 import pandas as pd
 import os
-import platform
 import time
 import glob
 import subprocess
-import openai
 import numpy as np
+from docx import Document
+import fitz
 from dotenv import load_dotenv
-from gemma_functions import GemmaFunctions
-from web_scrapper import fetch_and_save_data
+from LLM_functions import LLMFunctions
+from web_scrapper import fetch_and_save_data, save_code_to_path
 
 
 def run_playwright_test():
@@ -24,14 +24,13 @@ def run_playwright_test():
 class CleanGPTModels:
     def __init__(self):
         load_dotenv()
-        self.gpt_functions = GemmaFunctions()
-        openai.api_key = os.getenv('OPENAI_API_KEY')
+        self.gpt_functions = LLMFunctions()
 
-        if not os.path.exists('violationsWithFixedContent.csv'):
-            with open('violationsWithFixedContent.csv', 'w') as file:
+        if not os.path.exists('violationResult.csv'):
+            with open('violationResult.csv', 'w') as file:
                 file.write('id,impact,tags,description,help,helpUrl,nodeImpact,nodeHtml,nodeTarget,nodeType,message,numViolation\n')
 
-        self.input_df = pd.read_csv('violationsWithFixedContent.csv')
+        self.input_df = pd.read_csv('violationResult.csv')
 
     def add_severity_score(self, df, column_name, insert_index):
         impact_values = {
@@ -141,9 +140,9 @@ class CleanGPTModels:
                     const violations = accessibilityScanResults.violations;
 
                     // Write CSV data to file
-                    fileReader.writeFileSync("violationsWithFixedContent.csv", violationsToCSV(violations));
+                    fileReader.writeFileSync("violationResult.csv", violationsToCSV(violations));
                     // Write the number of violations to a file
-                    fileReader.writeFileSync("num_violations.txt", String(violations.length));
+                    fileReader.writeFileSync("num_of_violations.txt", String(violations.length));
                 }});
             """)
 
@@ -152,12 +151,12 @@ class CleanGPTModels:
         time.sleep(1)
 
 
-        if os.path.exists('num_violations.txt'):
+        if os.path.exists('num_of_violations.txt'):
             try:
-                os.remove('num_violations.txt')
+                os.remove('num_of_violations.txt')
             except PermissionError:
                 time.sleep(1)
-                os.remove('num_violations.txt')        
+                os.remove('num_of_violations.txt')        
 
     def generate_violation_report_from_content(self, corrected_dom):
         test_script_path = "./tests/after.spec.ts"
@@ -173,7 +172,7 @@ class CleanGPTModels:
                 const accessibilityScanResults = await new AxeBuilder({{ page }}).analyze();
                 const violations = accessibilityScanResults.violations;
 
-                fileReader.writeFile("num_violations2.txt", String(violations.length), function(err) {{
+                fileReader.writeFile("num_of_violations.txt", String(violations.length), function(err) {{
                     if (err) console.log(err);
                 }});
 
@@ -192,8 +191,8 @@ class CleanGPTModels:
         time.sleep(1)
 
         length = 0
-        if os.path.exists('num_violations2.txt'):
-            with open('num_violations2.txt', "r") as length_file:
+        if os.path.exists('num_of_violations.txt'):
+            with open('num_of_violations.txt', "r") as length_file:
                 length = int(length_file.readline().strip())
 
         new_df = pd.DataFrame()
@@ -224,12 +223,12 @@ class CleanGPTModels:
         new_df = new_df.reset_index(drop=True)
         self.remove_files_starting_with("data*")
 
-        if os.path.exists('num_violations2.txt'):
+        if os.path.exists('num_of_violations.txt'):
             try:
-                os.remove('num_violations2.txt')
+                os.remove('num_of_violations.txt')
             except PermissionError:
                 time.sleep(1)
-                os.remove('num_violations2.txt')
+                os.remove('num_of_violations.txt')
 
         new_df = self.add_severity_score(new_df, 'finalScore', 3)
         return new_df
@@ -238,16 +237,48 @@ class CleanGPTModels:
         print("Violation result after corrections.....")
         df_corrections = pd.DataFrame()
         dom_corrected = self.input_df.iloc[0]['DOMCorrected']
-        # print("checking", url)
+
         df_temp = self.generate_violation_report_from_content(dom_corrected)
         df_corrections = pd.concat([df_corrections, df_temp])
         df_corrections.to_csv('correctionViolations.csv', index=False)
         return df_corrections
 
+    def extract_text_from_pdf(self, file_bytes):
+        text = ""
+        with fitz.open(stream=file_bytes, filetype="pdf") as pdf:
+            for page in pdf:
+                text += page.get_text()
+        return text
 
-    def analyze_violations(self, url, path):
+    def extract_text_from_docx(self, file_bytes):
+        text = ""
+        doc = Document(io.BytesIO(file_bytes))
+        for paragraph in doc.paragraphs:
+            text += paragraph.text + "\n"
+        return text
+
+    def analyze_violations_from_file(self, file, path):
+        try:
+            file_content = file.read()
+            if file.filename.endswith(".pdf"):
+                code = self.extract_text_from_pdf(file_content)
+            elif file.filename.endswith(".docx"):
+                code = self.extract_text_from_docx(file_content)
+            else:
+                raise ValueError("Unsupported file format")
+
+            return self.analyze_violations_from_code(code, path)
+
+        except Exception as e:
+            print(f"Error processing file: {e}")
+            raise ValueError("Failed to process file content")
+
+
+
+
+    def analyze_violations_from_URL(self, url, path):
         fetch_and_save_data(url, path)
-        self.create_test_script(url, path)
+        self.create_test_script(path)
         self.input_df = self.add_severity_score(self.input_df, 'initialScore', 5)
         
         print("total # of violations: ", len(self.input_df))
@@ -256,7 +287,37 @@ class CleanGPTModels:
         self.create_corrected_dom_column(path)
         
         dom_corrected = self.input_df.iloc[0]['DOMCorrected']
-        result_df = self.generate_violation_report_from_content(url, dom_corrected)
+        result_df = self.generate_violation_report_from_content(dom_corrected)
+       
+        total_final_severity_score = self.calculate_severity_score(result_df, 'finalScore')
+        total_improvement = ((1 - (total_final_severity_score / total_initial_severity_score)) * 100)
+
+
+        print(f"Total initial severity score: {total_initial_severity_score}")
+        print(f"Total final severity score: {total_final_severity_score}")
+        print(f"Total improvement: {total_improvement}")
+        # print(result_df)
+
+        return {
+            "total_initial_severity_score": int(total_initial_severity_score) if isinstance(total_initial_severity_score, np.integer) else total_initial_severity_score,
+            "total_final_severity_score": int(total_final_severity_score) if isinstance(total_final_severity_score, np.integer) else total_final_severity_score,
+            "total_improvement": float(total_improvement) if isinstance(total_improvement, (np.integer, np.floating)) else total_improvement,
+            # "result_df": result_df.to_dict()
+        }
+    
+
+    def analyze_violations_from_code(self, code, path):
+        save_code_to_path(code, path)
+        self.create_test_script(path)
+        self.input_df = self.add_severity_score(self.input_df, 'initialScore', 5)
+        
+        print("total # of violations: ", len(self.input_df))
+
+        total_initial_severity_score = self.calculate_severity_score(self.input_df, 'initialScore')
+        self.create_corrected_dom_column(path)
+        
+        dom_corrected = self.input_df.iloc[0]['DOMCorrected']
+        result_df = self.generate_violation_report_from_content(dom_corrected)
        
         total_final_severity_score = self.calculate_severity_score(result_df, 'finalScore')
         total_improvement = ((1 - (total_final_severity_score / total_initial_severity_score)) * 100)
@@ -275,7 +336,14 @@ class CleanGPTModels:
         }
 
 
-def analyze(url: str):
+def analyzeURL(url: str):
     model = CleanGPTModels()
     path = 'data/input.html'
-    return model.analyze_violations(url, path)
+    return model.analyze_violations_from_URL(url, path)
+
+
+
+def analyzeCode(code: str):
+    model = CleanGPTModels()
+    path = 'data/input.html'
+    return model.analyze_violations_from_code(code, path)
