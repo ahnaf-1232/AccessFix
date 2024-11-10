@@ -21,8 +21,12 @@ export class AnalysisService {
   analyzeUrl(url: string): Observable<any> {
     return this.http.post(`${baseUrl}/analyzeUrl`, { url });
   }
-  
-  analyzeFile(fileContent: string): Observable<any> {
-    return this.http.post(`${baseUrl}/analyzeFile`, { content: fileContent });
+
+  analyzeFile(fileContent: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', fileContent, fileContent.name);  
+    return this.http.post(`${baseUrl}/analyzeFile`, formData);
   }
+  
+
 }

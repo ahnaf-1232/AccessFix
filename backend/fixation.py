@@ -209,21 +209,30 @@ class CleanGPTModels:
             with open(path, 'r', encoding='utf-8') as text_file:
                 dom = text_file.read()
 
+            # Normalize the DOM string by removing extra whitespace
+            dom = ' '.join(dom.split())
+
             # Populate error-fix dictionary with valid corrections only
             for index, row in self.input_df.iterrows():
-                error = row['nodeHtml']
+                error = ' '.join(row['nodeHtml'].split())  # Normalize error string
                 fix = self.gpt_functions.get_correction(index)
-                if error and fix and error != fix:
-                    error_fix_dict[error] = fix
+                if fix:
+                    fix = ' '.join(fix.split())  # Normalize fix string
+                    if error and fix and error != fix:
+                        error_fix_dict[error] = fix
 
             # Make a copy of the DOM to apply corrections
             dom_corrected = dom
-            for error, fix in error_fix_dict.items():
-                # Ensure the error string exists in DOM before attempting replace
-                if error in dom_corrected:
-                    dom_corrected = dom_corrected.replace(error, fix)
-                else:
-                    print(f"Error '{error}' not found in DOM; skipping replacement.")
+
+            # Sort error strings by length (longest first) to avoid partial replacements
+            errors = sorted(error_fix_dict.keys(), key=len, reverse=True)
+            
+            for error in errors:
+                fix = error_fix_dict[error]
+                # Use case-insensitive search and replace
+                import re
+                pattern = re.compile(re.escape(error), re.IGNORECASE)
+                dom_corrected = pattern.sub(fix, dom_corrected)
 
             # Store the corrected DOM in the DataFrame and as a class attribute
             self.input_df['DOMCorrected'] = dom_corrected
@@ -235,8 +244,13 @@ class CleanGPTModels:
             # Save the corrected DOM to a new file with proper error handling
             corrected_path = os.path.join('data', 'corrected.html')
             try:
+                # Pretty print the HTML before saving
+                from bs4 import BeautifulSoup
+                soup = BeautifulSoup(dom_corrected, 'html.parser')
+                formatted_html = soup.prettify()
+                
                 with open(corrected_path, 'w', encoding='utf-8') as corrected_file:
-                    corrected_file.write(dom_corrected)
+                    corrected_file.write(formatted_html)
                 print(f"Corrected DOM saved to {corrected_path}")
             except IOError as e:
                 print(f"Error writing corrected DOM to file: {e}")
@@ -257,6 +271,7 @@ class CleanGPTModels:
             self.final_corrected_dom = dom if 'dom' in locals() else None
             raise
 
+        
     def remove_files_starting_with(self, pattern):
         files_to_remove = glob.glob(pattern)
         for file_path in files_to_remove:
@@ -416,34 +431,23 @@ class CleanGPTModels:
             # "result_df": result_df.to_dict()
         }
 
-    async def analyze_violations_from_file(self, file: UploadFile, path: str) -> Dict[str, Any]:
+    def analyze_violations_from_file(self, content: bytes, filename: str, path: str) -> Dict[str, Any]:
         try:
-            # Read file content
-            content = await file.read()
-
-            # Extract text based on file type
-            if file.filename.lower().endswith('.pdf'):
-                code = await self.file_extractor.extract_text_from_pdf(content)
-            elif file.filename.lower().endswith('.docx'):
-                code = await self.file_extractor.extract_text_from_docx(content)
-            elif file.filename.lower().endswith('.html'):
-                code = await self.file_extractor.extract_text_from_html(content)
+            if filename.lower().endswith('.pdf'):
+                code = self.file_extractor.extract_text_from_pdf(content)
+            elif filename.lower().endswith('.docx'):
+                code = self.file_extractor.extract_text_from_docx(content)
+            elif filename.lower().endswith('.html'):
+                code = self.file_extractor.extract_text_from_html(content)
             else:
                 raise ValueError("Unsupported file format")
 
-            # Make sure analyze_violations_from_code is properly awaited if it's async
-            if asyncio.iscoroutinefunction(self.analyze_violations_from_code):
-                result = await self.analyze_violations_from_code(code, path)
-            else:
-                result = self.analyze_violations_from_code(code, path)
-
+            result = self.analyze_violations_from_code(code, path)
             return result
 
         except Exception as e:
             print(f"Error processing file: {str(e)}")
-            # Re-raise the original exception with more context
             raise ValueError(f"Failed to process file content: {str(e)}") from e
-
 
 def analyzeURL(url: str):
     model = CleanGPTModels()
@@ -456,11 +460,11 @@ def analyzeCode(code: str):
     path = 'data/input.html'
     return model.analyze_violations_from_code(code, path)
 
-
-async def analyzeCodeFromFile(file: UploadFile) -> Dict[str, Any]:
+def analyzeCodeFromFile(content: bytes, filename: str) -> Dict[str, Any]:
     try:
         model = CleanGPTModels()
-        result = await model.analyze_violations_from_file(file, 'data/input.html')
+        # Pass both content and filename to the analyze function
+        result = model.analyze_violations_from_file(content, filename, 'data/input.html')
         return result
     except Exception as e:
         raise ValueError(f"Analysis failed: {str(e)}")

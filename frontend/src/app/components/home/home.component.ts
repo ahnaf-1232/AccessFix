@@ -11,7 +11,7 @@ export class HomeComponent {
   title: string = 'AccessFix';
   code: string = '';
   url: string = '';
-  fileContent: string = '';
+  fileContent: File | null = null;
   errorMessage: string = '';
   selectedFileName: string = 'Select a file';
   loading: boolean = false;
@@ -48,7 +48,10 @@ export class HomeComponent {
         }
       );
     } else if (this.fileContent) {
-      this.codeAnalysisService.analyzeFile(this.fileContent).subscribe(
+      const file = this.fileContent;  // Directly use the file here, not FormData
+    
+      // Send file object to analyzeFile method
+      this.codeAnalysisService.analyzeFile(file).subscribe(
         response => {
           this.report = JSON.stringify(response, null, 2);
           this.clearFields();
@@ -59,7 +62,8 @@ export class HomeComponent {
           this.loading = false;
         }
       );
-    } else {
+    }
+    else {
       this.errorMessage = 'Please enter code, select a file, or enter a URL.';
       this.loading = false;
     }
@@ -67,24 +71,19 @@ export class HomeComponent {
 
   handleFileChange(input: any): void {
     const file = input.files[0];
-    if (file ) { // Check for plain text files
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.fileContent = e.target.result;
-        this.code = '';
-      };
-      reader.readAsText(file);
+    if (file) {
+      this.fileContent = file;
+      this.code = ''; // Clear code if file is selected
       this.selectedFileName = file.name;
     } else {
-      this.errorMessage = 'Please select a valid text file.';
+      this.errorMessage = 'Please select a valid file.';
       this.selectedFileName = 'Select a file';
     }
   }
-
   clearFields(): void {
     this.code = '';
     this.url = '';
-    this.fileContent = '';
+    this.fileContent = null;
     this.selectedFileName = 'Select a file';
   }
 }

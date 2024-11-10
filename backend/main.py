@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Any
@@ -25,8 +25,6 @@ class CodeAnalysisRequest(BaseModel):
 class UrlAnalysisRequest(BaseModel):
     url: str
 
-class FileAnalysisRequest(BaseModel):
-    content: str
 
 @app.post("/analyzeCode")
 async def analyze_code(request: CodeAnalysisRequest):
@@ -49,11 +47,12 @@ async def analyze_url(request: UrlAnalysisRequest) -> Any:
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/analyzeFile")
-async def analyze_file(request: FileAnalysisRequest):
+async def analyze_file(file: UploadFile = File(...)):
     try:
-        logging.info(f"Received file content for analysis: {request.content}")
-        result = analyzeCodeFromFile(request.content)
+        logging.info(f"Received file content for analysis: {file.filename}")
+        content = await file.read()
+        result = analyzeCodeFromFile(content, file.filename)
         return result
     except Exception as e:
         logging.error(f"Error analyzing file content: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Error analyzing file: {str(e)}")
