@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { AnalysisService } from '../../services/analysis.service';
+import { Analysis } from 'src/app/models/analysis';
 
 @Component({
   selector: 'app-home',
@@ -7,7 +8,7 @@ import { AnalysisService } from '../../services/analysis.service';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent {
-  report: any;
+  report: Analysis | null = null;
   title: string = 'AccessFix';
   code: string = '';
   url: string = '';
@@ -26,7 +27,7 @@ export class HomeComponent {
     if (this.code) {
       this.codeAnalysisService.analyzeCode(this.code).subscribe(
         response => {
-          this.report = JSON.stringify(response, null, 2);
+          this.report = response;
           this.clearFields();
           this.loading = false;
         },
@@ -38,7 +39,7 @@ export class HomeComponent {
     } else if (this.url) {
       this.codeAnalysisService.analyzeUrl(this.url).subscribe(
         response => {
-          this.report = JSON.stringify(response, null, 2);
+          this.report = response;
           this.clearFields();
           this.loading = false;
         },
@@ -53,7 +54,7 @@ export class HomeComponent {
       // Send file object to analyzeFile method
       this.codeAnalysisService.analyzeFile(file).subscribe(
         response => {
-          this.report = JSON.stringify(response, null, 2);
+          this.report = response;
           this.clearFields();
           this.loading = false;
         },

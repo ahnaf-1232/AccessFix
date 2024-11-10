@@ -70,10 +70,26 @@
                 <div class="md:w-1/2 p-6 bg-gray-50">
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">Code Analysis Report</h2>
                     <div class="bg-white p-4 rounded-md shadow-inner h-[calc(100%-2rem)] overflow-auto">
-                        <pre *ngIf="report" class="text-sm text-gray-800 whitespace-pre-wrap">{{ report }}</pre>
-                        <p *ngIf="!report" class="text-gray-500 italic">Your code analysis report will appear here.</p>
+                        <!-- Displaying the report as JSON -->
+                        <div *ngIf="report" class="text-sm text-gray-800 bg-gray-100 p-4 rounded-md space-y-2">
+                            <p><strong>Total Initial Severity Score:</strong> {{ report.total_initial_severity_score }}</p>
+                            <p><strong>Total Final Severity Score:</strong> {{ report.total_final_severity_score }}</p>
+                            <p><strong>Total Improvement (%):</strong> {{ report.total_improvement | number:'1.2-2' }}</p>
+                        </div>
+                
+                        <!-- Displaying corrected HTML -->
+                        <div *ngIf="report?.corrected_html" class="bg-gray-100 p-4 rounded-md">
+                            <h3 class="font-semibold text-gray-800 mb-2">Corrected HTML</h3>
+                            <div class="overflow-x-auto">
+                                <pre class="text-sm text-gray-800 whitespace-pre-wrap">{{ report?.corrected_html }}</pre>
+                            </div>
+                        </div>
+                
+                        <!-- Fallback message -->
+                        <p *ngIf="!report || !report.corrected_html" class="text-gray-500 italic">Your code analysis report will appear here.</p>
                     </div>
                 </div>
+                                
             </div>
         </div>
     </div>
