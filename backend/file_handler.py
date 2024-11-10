@@ -1,21 +1,35 @@
-import io
-from docx import Document
-import fitz
+import asyncio
+from io import BytesIO
+import docx
+from pdfminer.high_level import extract_text
+from bs4 import BeautifulSoup
 
-
-def extract_text_from_pdf(self, file_bytes):
-        text = ""
-        with fitz.open(stream=file_bytes, filetype="pdf") as pdf:
-            for page in pdf:
-                text += page.get_text()
-        return text
-
-def extract_text_from_docx(self, file_bytes):
-        text = ""
-        doc = Document(io.BytesIO(file_bytes))
-        for paragraph in doc.paragraphs:
-            text += paragraph.text + "\n"
-        return text
-
-def extract_text_from_html(self, file_bytes):
-        return file_bytes.decode("utf-8")
+class FileExtractor:
+    async def extract_text_from_pdf(self, content: bytes) -> str:
+        """Extract text from PDF content."""
+        try:
+            return await asyncio.get_event_loop().run_in_executor(
+                None,
+                lambda: extract_text(BytesIO(content))
+            )
+        except Exception as e:
+            raise ValueError(f"Failed to extract text from PDF: {str(e)}")
+            
+    async def extract_text_from_docx(self, content: bytes) -> str:
+        """Extract text from DOCX content."""
+        try:
+            doc = docx.Document(BytesIO(content))
+            return await asyncio.get_event_loop().run_in_executor(
+                None,
+                lambda: '\n'.join(paragraph.text for paragraph in doc.paragraphs)
+            )
+        except Exception as e:
+            raise ValueError(f"Failed to extract text from DOCX: {str(e)}")
+            
+    async def extract_text_from_html(self, content: bytes) -> str:
+        """Extract text from HTML content."""
+        try:
+            soup = BeautifulSoup(content.decode('utf-8'), 'html.parser')
+            return str(soup)
+        except Exception as e:
+            raise ValueError(f"Failed to extract text from HTML: {str(e)}")
