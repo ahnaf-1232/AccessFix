@@ -57,7 +57,7 @@ class CleanGPTModels:
         while not os.path.exists(file_path):
             if time.time() - start_time > timeout:
                 raise TimeoutError(f"File '{file_path}' not found within timeout")
-            time.sleep(0.1)
+            # time.sleep(0.1)
         
     def read_violation_file(self):
         """Read the violation CSV file into DataFrame"""
@@ -174,7 +174,7 @@ class CleanGPTModels:
             try:
                 os.remove('num_of_violations.txt')
             except PermissionError:
-                time.sleep(0.5)
+                # time.sleep(0.5)
                 os.remove('num_of_violations.txt')
 
 
@@ -217,6 +217,9 @@ class CleanGPTModels:
                 error = ' '.join(row['nodeHtml'].split())  # Normalize error string
                 fix = self.gpt_functions.get_correction(index)
                 if fix:
+                    # Handle different response formats
+                    if fix.startswith('[') and fix.endswith(']'):
+                        fix = fix[2:-2]  # Remove the outer brackets
                     fix = ' '.join(fix.split())  # Normalize fix string
                     if error and fix and error != fix:
                         error_fix_dict[error] = fix
@@ -271,7 +274,6 @@ class CleanGPTModels:
             self.final_corrected_dom = dom if 'dom' in locals() else None
             raise
 
-
     def remove_files_starting_with(self, pattern):
         files_to_remove = glob.glob(pattern)
         for file_path in files_to_remove:
@@ -311,7 +313,7 @@ class CleanGPTModels:
             )
 
         run_playwright_test()
-        time.sleep(1)
+        # time.sleep(1)
 
         length = 0
         if os.path.exists('num_of_violations.txt'):
@@ -350,7 +352,7 @@ class CleanGPTModels:
             try:
                 os.remove('num_of_violations.txt')
             except PermissionError:
-                time.sleep(1)
+                # time.sleep(1)
                 os.remove('num_of_violations.txt')
 
         new_df = self.add_severity_score(new_df, 'finalScore', 3)
@@ -404,9 +406,11 @@ class CleanGPTModels:
             "corrected_html": corrected_html,
         }
     
+
+
     def analyze_violations_from_code(self, code, path):
         save_code_to_path(code, path)
-        time.sleep(1)
+        # time.sleep(1)
         self.create_test_script(path)
         self.input_df = self.add_severity_score(self.input_df, 'initialScore', 5)
         
@@ -429,11 +433,6 @@ class CleanGPTModels:
         if os.path.exists(corrected_file_path):
             with open(corrected_file_path, 'r', encoding='utf-8') as f:
                 corrected_html = f.read()
-
-        print(f"Total initial severity score: {total_initial_severity_score}")
-        print(f"Total final severity score: {total_final_severity_score}")
-        print(f"Total improvement: {total_improvement}")
-        print(f"Corrected HTML: {corrected_html}")
 
         return {
             "total_initial_severity_score": int(total_initial_severity_score) if isinstance(total_initial_severity_score, np.integer) else total_initial_severity_score,
@@ -475,7 +474,6 @@ def analyzeCode(code: str):
 def analyzeCodeFromFile(content: bytes, filename: str) -> Dict[str, Any]:
     try:
         model = CleanGPTModels()
-        # Pass both content and filename to the analyze function
         result = model.analyze_violations_from_file(content, filename, 'data/input.html')
         return result
     except Exception as e:
