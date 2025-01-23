@@ -5,6 +5,7 @@ import re
 import ollama
 import chromadb
 import json
+import openai
 
 class LLMFunctions:
     def __init__(self):
@@ -44,15 +45,16 @@ class LLMFunctions:
                         level = criterion.get('level', 'N/A')
                         
                         doc = (
-                            f"Top-level Title: {title1}\n"
-                            f"Top-level ID: {ref_id1}\n\n"
-                            f"Guideline Title: {title2}\n"
-                            f"Guideline ID: {ref_id2}\n\n"
-                            f"Success Criterion ID: {ref_id}\n"
-                            f"Success Criterion Title: {title}\n"
-                            f"Description: {description}\n"
-                            f"URL: {url}\n"
-                            f"Level: {level}\n"
+                            # f"Top-level Title: {title1}\n"
+                            # f"Top-level ID: {ref_id1}\n\n"
+                            # f"Guideline Title: {title2}\n"
+                            # f"Guideline ID: {ref_id2}\n\n"
+                            # f"Success Criterion ID: {ref_id}\n"
+                            # f"Success Criterion Title: {title}\n"
+                            # f"Description: {description}\n"
+                            # f"URL: {url}\n"
+                            # f"Level: {level}\n"
+                            f"WCAG: {ref_id} : {title} - {description}\n"
                         )
                         
                         response = ollama.embeddings(model="mxbai-embed-large", prompt=doc)
@@ -72,10 +74,20 @@ class LLMFunctions:
             {"role": "system", "content": system},
             {"role": "user", "content": user}
         ]
-
+        
+        response = openai.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": user},
+            ],
+        )
+        
+        return response.choices[0].message.content
+    
         response = ollama.chat(model='codegemma:latest', messages=prompt)
         content = response['message']['content']
-    
+        
         return content
 
     def generate_prompt(self, row_index):
@@ -115,17 +127,35 @@ class LLMFunctions:
         system_msg, user_msg = self.generate_prompt(row_index)
         response = self.LLM_response(system_msg, user_msg, row_index)
 
-        print("LLM Response:", response)
+        # print("LLM Response:", response)
 
         match = re.search(r"Correct:\s*\[\[(.*?)\]\]", response, re.DOTALL)
         if match:
-            corrected_content = match.group(1).strip() 
-            corrected_content = corrected_content.replace("'", "").replace('"', "").strip() 
+            corrected_content = match.group(1).strip()
+            corrected_content = corrected_content.replace("'", "").replace('"', "").strip()
             corrected_content = corrected_content.replace("\n", "").strip()
-            return corrected_content
+            # print("Correction found:", corrected_content)
         else:
             print("No correction found; returning original HTML.")
-            return self.df['nodeHtml'][row_index]
+            corrected_content = self.df['nodeHtml'][row_index]
+
+        # Read the current HTML content from the file
+        corrected_file_path = os.path.join('data', 'corrected.html')
+        with open(corrected_file_path, 'r', encoding='utf-8') as file:
+            html_content = file.read()
+
+        # Replace the specified part of the HTML with the corrected content
+        old_content = self.df['nodeHtml'][row_index]
+        print("Old content:", old_content)
+        print("Corrected content:", corrected_content)
+        updated_html = html_content.replace(old_content, corrected_content)
+
+        # Write the updated HTML back to the file
+        with open(corrected_file_path, 'w', encoding='utf-8') as file:
+            file.write(updated_html)
+
+        print(f"Updated HTML content for row {row_index} has been written.")
+        return corrected_content
 
 
 gpt_functions = LLMFunctions()
