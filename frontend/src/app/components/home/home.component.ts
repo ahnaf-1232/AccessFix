@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { AnalysisService } from '../../services/analysis.service';
 import { Analysis } from 'src/app/models/analysis';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-home',
@@ -17,7 +18,11 @@ export class HomeComponent {
   selectedFileName: string = 'Select a file';
   loading: boolean = false;
 
-  constructor(private codeAnalysisService: AnalysisService) {}
+  showChat = false;
+  messages: { text: string; sender: string }[] = [];
+  userInput = '';
+
+  constructor(private codeAnalysisService: AnalysisService, private http: HttpClient) {}
 
   handleSubmit(): void {
     this.errorMessage = '';
@@ -81,6 +86,32 @@ export class HomeComponent {
       this.selectedFileName = 'Select a file';
     }
   }
+
+  toggleChat() {
+    this.showChat = !this.showChat;
+    if (!this.showChat) {
+      this.messages = []; // Clean chat when closed
+    }
+  }
+
+  sendMessage() {
+    if (this.userInput.trim()) {
+      this.messages.push({ text: this.userInput, sender: 'user' });
+      this.http.post<any>('API_ENDPOINT', { message: this.userInput })
+        .subscribe(response => {
+          this.messages.push({ text: response, sender: 'bot' });
+          this.userInput = ''; // Clear input after sending
+        });
+         
+        // Simulate response from an API by directly adding the "Hello World" response
+      //   setTimeout(() => {
+      //     this.messages.push({ text: 'Hello World', sender: 'bot' });
+      // }, 500); // Adding a timeout to simulate network delay
+      
+      this.userInput = '';
+    }
+  }
+
   clearFields(): void {
     this.code = '';
     this.url = '';

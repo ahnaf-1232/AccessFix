@@ -1,0 +1,23 @@
+/* .user-msg {
+    text-align: right;
+    background-color: lightgray;
+    padding: 5px 10px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+}
+
+.bot-msg {
+    text-align: left;
+    background-color: lightblue;
+    padding: 5px 10px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+
+.fas.fa-user, .fas.fa-robot {
+    font-size: 1.2em;
+} */
