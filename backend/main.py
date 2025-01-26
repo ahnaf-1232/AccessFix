@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from typing import Any
 import logging
 from fixation import analyzeURL, analyzeCode, analyzeCodeFromFile
+from chat import ChatGPT 
 
 app = FastAPI()
 
@@ -24,7 +25,11 @@ class CodeAnalysisRequest(BaseModel):
 
 class UrlAnalysisRequest(BaseModel):
     url: str
+    
+class ChatQuery(BaseModel):
+    code: str
 
+chat_gpt = ChatGPT()
 
 @app.post("/analyzeCode")
 async def analyze_code(request: CodeAnalysisRequest):
@@ -56,3 +61,13 @@ async def analyze_file(file: UploadFile = File(...)):
     except Exception as e:
         logging.error(f"Error analyzing file content: {e}")
         raise HTTPException(status_code=500, detail=f"Error analyzing file: {str(e)}")
+
+
+@app.post("/chat")
+async def chat_response(query: ChatQuery):
+    try:
+        response = await chat_gpt.generate_response(query.code)
+        return {"text": response}
+    except Exception as e:
+        print(f"Error: {str(e)}") 
+        return {"error": str(e)}

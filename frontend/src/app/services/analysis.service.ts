@@ -28,5 +28,10 @@ export class AnalysisService {
     return this.http.post(`${baseUrl}/analyzeFile`, formData);
   }
   
+  
+  chatResponse(query: string): Observable<any> {
+    return this.http.post(`${baseUrl}/chat`, { code: query });
+  }
+
 
 }

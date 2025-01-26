@@ -96,21 +96,22 @@ export class HomeComponent {
 
   sendMessage() {
     if (this.userInput.trim()) {
-      this.messages.push({ text: this.userInput, sender: 'user' });
-      this.http.post<any>('API_ENDPOINT', { message: this.userInput })
-        .subscribe(response => {
-          this.messages.push({ text: response, sender: 'bot' });
-          this.userInput = ''; // Clear input after sending
-        });
-         
-        // Simulate response from an API by directly adding the "Hello World" response
-      //   setTimeout(() => {
-      //     this.messages.push({ text: 'Hello World', sender: 'bot' });
-      // }, 500); // Adding a timeout to simulate network delay
-      
-      this.userInput = '';
+      const userInput = this.userInput.trim();
+      this.messages.push({ text: userInput, sender: 'user' });
+  
+      this.codeAnalysisService.chatResponse(userInput).subscribe(
+        response => {
+          this.messages.push({ text: response.text, sender: 'bot' });
+          this.userInput = '';
+        },
+        error => {
+          console.error(`Error fetching response: ${error}`);  // Debug error
+          this.errorMessage = 'Error fetching response.';
+        }
+      );
     }
   }
+  
 
   clearFields(): void {
     this.code = '';
