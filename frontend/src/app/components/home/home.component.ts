@@ -33,7 +33,7 @@ export class HomeComponent {
       this.codeAnalysisService.analyzeCode(this.code).subscribe(
         response => {
           this.report = response;
-          this.clearFields();
+          // this.clearFields();
           this.loading = false;
         },
         error => {
@@ -45,7 +45,7 @@ export class HomeComponent {
       this.codeAnalysisService.analyzeUrl(this.url).subscribe(
         response => {
           this.report = response;
-          this.clearFields();
+          // this.clearFields();
           this.loading = false;
         },
         error => {
@@ -60,7 +60,7 @@ export class HomeComponent {
       this.codeAnalysisService.analyzeFile(file).subscribe(
         response => {
           this.report = response;
-          this.clearFields();
+          // this.clearFields();
           this.loading = false;
         },
         error => {

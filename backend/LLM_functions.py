@@ -6,6 +6,8 @@ import ollama
 import chromadb
 import json
 import openai
+from bs4 import BeautifulSoup
+
 
 class LLMFunctions:
     def __init__(self):
@@ -26,46 +28,29 @@ class LLMFunctions:
             return self.client.create_collection(name=name)
 
     def populate_collection(self):
-        existing_ids = set()
+        existing_ids = set(self.collection.get()['ids'])  # Get existing IDs
+        
         for item in self.wcag_data:
             for guideline in item['guidelines']:
                 for criterion in guideline.get('success_criteria', []):
                     ref_id = criterion['ref_id']
-                    if ref_id not in existing_ids:
-                        existing_ids.add(ref_id)
-                        title1 = item['title']
-                        ref_id1 = item['ref_id']
-
-                        title2 = guideline['title']
-                        ref_id2 = guideline['ref_id']
-
-                        title = criterion['title']
-                        description = criterion['description']
-                        url = criterion['url']
-                        level = criterion.get('level', 'N/A')
-                        
-                        doc = (
-                            # f"Top-level Title: {title1}\n"
-                            # f"Top-level ID: {ref_id1}\n\n"
-                            # f"Guideline Title: {title2}\n"
-                            # f"Guideline ID: {ref_id2}\n\n"
-                            # f"Success Criterion ID: {ref_id}\n"
-                            # f"Success Criterion Title: {title}\n"
-                            # f"Description: {description}\n"
-                            # f"URL: {url}\n"
-                            # f"Level: {level}\n"
-                            f"WCAG: {ref_id} : {title} - {description}\n"
-                        )
-                        
-                        response = ollama.embeddings(model="mxbai-embed-large", prompt=doc)
-                        embedding = response["embedding"]
-                        
-                        self.collection.add(
-                            ids=[ref_id],
-                            embeddings=[embedding],
-                            documents=[doc]
-                        )
-                        
+                    
+                    # Skip if ID already exists
+                    if ref_id in existing_ids:
+                        continue
+                    
+                    existing_ids.add(ref_id)
+                    
+                    doc = f"WCAG: {ref_id} : {criterion['title']} - {criterion['description']}\n"
+                    
+                    response = ollama.embeddings(model="mxbai-embed-large", prompt=doc)
+                    embedding = response["embedding"]
+                    
+                    self.collection.add(
+                        ids=[ref_id],
+                        embeddings=[embedding],
+                        documents=[doc]
+                    )
 
     def LLM_response(self, system, user, row_index):
         print(f"\n...................................... Call : {row_index}...............................................")
@@ -85,10 +70,10 @@ class LLMFunctions:
         
         return response.choices[0].message.content
     
-        response = ollama.chat(model='codegemma:latest', messages=prompt)
-        content = response['message']['content']
+        # response = ollama.chat(model='codegemma:latest', messages=prompt)
+        # content = response['message']['content']
         
-        return content
+        # return content
 
     def generate_prompt(self, row_index):
         system_msg = """You are an assistant who will correct web accessibility issues of a provided website.
@@ -127,34 +112,30 @@ class LLMFunctions:
         system_msg, user_msg = self.generate_prompt(row_index)
         response = self.LLM_response(system_msg, user_msg, row_index)
 
-        # print("LLM Response:", response)
-
+        # Extract correction
         match = re.search(r"Correct:\s*\[\[(.*?)\]\]", response, re.DOTALL)
         if match:
             corrected_content = match.group(1).strip()
-            corrected_content = corrected_content.replace("'", "").replace('"', "").strip()
-            corrected_content = corrected_content.replace("\n", "").strip()
-            # print("Correction found:", corrected_content)
+            corrected_content = re.sub(r'[\'\"\n]', '', corrected_content)
         else:
             print("No correction found; returning original HTML.")
             corrected_content = self.df['nodeHtml'][row_index]
 
-        # Read the current HTML content from the file
-        corrected_file_path = os.path.join('data', 'corrected.html')
-        with open(corrected_file_path, 'r', encoding='utf-8') as file:
-            html_content = file.read()
+        # # Update HTML file
+        # corrected_file_path = os.path.join('data', 'corrected.html')
+        
+        # # Read entire file content
+        # with open(corrected_file_path, 'r', encoding='utf-8') as file:
+        #     file_content = file.read()
 
-        # Replace the specified part of the HTML with the corrected content
-        old_content = self.df['nodeHtml'][row_index]
-        print("Old content:", old_content)
-        print("Corrected content:", corrected_content)
-        updated_html = html_content.replace(old_content, corrected_content)
+        # # Replace entire old content with new content
+        # old_content = self.df['nodeHtml'][row_index]
+        # updated_content = file_content.replace(old_content, corrected_content)
 
-        # Write the updated HTML back to the file
-        with open(corrected_file_path, 'w', encoding='utf-8') as file:
-            file.write(updated_html)
+        # # Write updated content back
+        # with open(corrected_file_path, 'w', encoding='utf-8') as file:
+        #     file.write(updated_content)
 
-        print(f"Updated HTML content for row {row_index} has been written.")
         return corrected_content
 
 

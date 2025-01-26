@@ -1,69 +1,32 @@
-id,impact,tags,description,help,helpUrl,nodeImpact,nodeHtml,nodeTarget,nodeType,message,numViolation
-document-title,serious,cat.text-alternatives|wcag2a|wcag242|TTv5|TT12.a|EN-301-549|EN-9.2.4.2|ACT,Ensure each HTML document contains a non-empty <title> element,Documents must have <title> element to aid in navigation,https://dequeuniversity.com/rules/axe/4.10/document-title?application=playwright,serious,"<html><head></head><body><img src=""logo.png"">
-<input type=""text"" value=""Enter your name"">
-<button style=""color: white; background-color: blue;"">
- Submit
-</button>
-<a href=""javascript:void(0);"">
- More Info
-</a>
-<p>
- Click here for more details
-</p>
-</body></html>",html,any,Document does not have a non-empty <title> element,7
-html-has-lang,serious,cat.language|wcag2a|wcag311|TTv5|TT11.a|EN-301-549|EN-9.3.1.1|ACT,Ensure every HTML document has a lang attribute,<html> element must have a lang attribute,https://dequeuniversity.com/rules/axe/4.10/html-has-lang?application=playwright,serious,"<html><head></head><body><img src=""logo.png"">
-<input type=""text"" value=""Enter your name"">
-<button style=""color: white; background-color: blue;"">
- Submit
-</button>
-<a href=""javascript:void(0);"">
- More Info
-</a>
-<p>
- Click here for more details
-</p>
-</body></html>",html,any,The <html> element does not have a lang attribute,7
-image-alt,critical,cat.text-alternatives|wcag2a|wcag111|section508|section508.22.a|TTv5|TT7.a|TT7.b|EN-301-549|EN-9.1.1.1|ACT,Ensure <img> elements have alternate text or a role of none or presentation,Images must have alternate text,https://dequeuniversity.com/rules/axe/4.10/image-alt?application=playwright,critical,"<img src=""logo.png"">",img,any,Element does not have an alt attribute,7
-image-alt,critical,cat.text-alternatives|wcag2a|wcag111|section508|section508.22.a|TTv5|TT7.a|TT7.b|EN-301-549|EN-9.1.1.1|ACT,Ensure <img> elements have alternate text or a role of none or presentation,Images must have alternate text,https://dequeuniversity.com/rules/axe/4.10/image-alt?application=playwright,critical,"<img src=""logo.png"">",img,any,aria-label attribute does not exist or is empty,7
-image-alt,critical,cat.text-alternatives|wcag2a|wcag111|section508|section508.22.a|TTv5|TT7.a|TT7.b|EN-301-549|EN-9.1.1.1|ACT,Ensure <img> elements have alternate text or a role of none or presentation,Images must have alternate text,https://dequeuniversity.com/rules/axe/4.10/image-alt?application=playwright,critical,"<img src=""logo.png"">",img,any,"aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty",7
-image-alt,critical,cat.text-alternatives|wcag2a|wcag111|section508|section508.22.a|TTv5|TT7.a|TT7.b|EN-301-549|EN-9.1.1.1|ACT,Ensure <img> elements have alternate text or a role of none or presentation,Images must have alternate text,https://dequeuniversity.com/rules/axe/4.10/image-alt?application=playwright,critical,"<img src=""logo.png"">",img,any,Element has no title attribute,7
-image-alt,critical,cat.text-alternatives|wcag2a|wcag111|section508|section508.22.a|TTv5|TT7.a|TT7.b|EN-301-549|EN-9.1.1.1|ACT,Ensure <img> elements have alternate text or a role of none or presentation,Images must have alternate text,https://dequeuniversity.com/rules/axe/4.10/image-alt?application=playwright,critical,"<img src=""logo.png"">",img,any,"Element's default semantics were not overridden with role=""none"" or role=""presentation""",7
-label,critical,cat.forms|wcag2a|wcag412|section508|section508.22.n|TTv5|TT5.c|EN-301-549|EN-9.4.1.2|ACT,Ensure every form element has a label,Form elements must have labels,https://dequeuniversity.com/rules/axe/4.10/label?application=playwright,critical,"<input type=""text"" value=""Enter your name"">",input,any,Form element does not have an implicit (wrapped) <label>,7
-label,critical,cat.forms|wcag2a|wcag412|section508|section508.22.n|TTv5|TT5.c|EN-301-549|EN-9.4.1.2|ACT,Ensure every form element has a label,Form elements must have labels,https://dequeuniversity.com/rules/axe/4.10/label?application=playwright,critical,"<input type=""text"" value=""Enter your name"">",input,any,Form element does not have an explicit <label>,7
-label,critical,cat.forms|wcag2a|wcag412|section508|section508.22.n|TTv5|TT5.c|EN-301-549|EN-9.4.1.2|ACT,Ensure every form element has a label,Form elements must have labels,https://dequeuniversity.com/rules/axe/4.10/label?application=playwright,critical,"<input type=""text"" value=""Enter your name"">",input,any,aria-label attribute does not exist or is empty,7
-label,critical,cat.forms|wcag2a|wcag412|section508|section508.22.n|TTv5|TT5.c|EN-301-549|EN-9.4.1.2|ACT,Ensure every form element has a label,Form elements must have labels,https://dequeuniversity.com/rules/axe/4.10/label?application=playwright,critical,"<input type=""text"" value=""Enter your name"">",input,any,"aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty",7
-label,critical,cat.forms|wcag2a|wcag412|section508|section508.22.n|TTv5|TT5.c|EN-301-549|EN-9.4.1.2|ACT,Ensure every form element has a label,Form elements must have labels,https://dequeuniversity.com/rules/axe/4.10/label?application=playwright,critical,"<input type=""text"" value=""Enter your name"">",input,any,Element has no title attribute,7
-label,critical,cat.forms|wcag2a|wcag412|section508|section508.22.n|TTv5|TT5.c|EN-301-549|EN-9.4.1.2|ACT,Ensure every form element has a label,Form elements must have labels,https://dequeuniversity.com/rules/axe/4.10/label?application=playwright,critical,"<input type=""text"" value=""Enter your name"">",input,any,Element has no placeholder attribute,7
-label,critical,cat.forms|wcag2a|wcag412|section508|section508.22.n|TTv5|TT5.c|EN-301-549|EN-9.4.1.2|ACT,Ensure every form element has a label,Form elements must have labels,https://dequeuniversity.com/rules/axe/4.10/label?application=playwright,critical,"<input type=""text"" value=""Enter your name"">",input,any,"Element's default semantics were not overridden with role=""none"" or role=""presentation""",7
-landmark-one-main,moderate,cat.semantics|best-practice,Ensure the document has a main landmark,Document should have one main landmark,https://dequeuniversity.com/rules/axe/4.10/landmark-one-main?application=playwright,moderate,"<html><head></head><body><img src=""logo.png"">
-<input type=""text"" value=""Enter your name"">
-<button style=""color: white; background-color: blue;"">
- Submit
-</button>
-<a href=""javascript:void(0);"">
- More Info
-</a>
-<p>
- Click here for more details
-</p>
-</body></html>",html,all,Document does not have a main landmark,7
-page-has-heading-one,moderate,cat.semantics|best-practice,"Ensure that the page, or at least one of its frames contains a level-one heading",Page should contain a level-one heading,https://dequeuniversity.com/rules/axe/4.10/page-has-heading-one?application=playwright,moderate,"<html><head></head><body><img src=""logo.png"">
-<input type=""text"" value=""Enter your name"">
-<button style=""color: white; background-color: blue;"">
- Submit
-</button>
-<a href=""javascript:void(0);"">
- More Info
-</a>
-<p>
- Click here for more details
-</p>
-</body></html>",html,all,Page must have a level-one heading,7
-region,moderate,cat.keyboard|best-practice,Ensure all page content is contained by landmarks,All page content should be contained by landmarks,https://dequeuniversity.com/rules/axe/4.10/region?application=playwright,moderate,"<img src=""logo.png"">",img,any,Some page content is not contained by landmarks,7
-region,moderate,cat.keyboard|best-practice,Ensure all page content is contained by landmarks,All page content should be contained by landmarks,https://dequeuniversity.com/rules/axe/4.10/region?application=playwright,moderate,"<input type=""text"" value=""Enter your name"">",input,any,Some page content is not contained by landmarks,7
-region,moderate,cat.keyboard|best-practice,Ensure all page content is contained by landmarks,All page content should be contained by landmarks,https://dequeuniversity.com/rules/axe/4.10/region?application=playwright,moderate,"<a href=""javascript:void(0);"">
- More Info
-</a>",a,any,Some page content is not contained by landmarks,7
-region,moderate,cat.keyboard|best-practice,Ensure all page content is contained by landmarks,All page content should be contained by landmarks,https://dequeuniversity.com/rules/axe/4.10/region?application=playwright,moderate,"<p>
- Click here for more details
-</p>",p,any,Some page content is not contained by landmarks,7
+id,impact,tags,description,help,helpUrl,nodeImpact,nodeHtml,nodeTarget,nodeType,numViolation
+color-contrast,serious,cat.color|wcag2aa|wcag143|TTv5|TT13.c|EN-301-549|EN-9.1.4.3|ACT,Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds,Elements must meet minimum color contrast ratio thresholds,https://dequeuniversity.com/rules/axe/4.10/color-contrast?application=playwright,serious,"<input style=""color: #ccc;"" type=""text"">",input,any,6
+image-alt,critical,cat.text-alternatives|wcag2a|wcag111|section508|section508.22.a|TTv5|TT7.a|TT7.b|EN-301-549|EN-9.1.1.1|ACT,Ensure <img> elements have alternate text or a role of none or presentation,Images must have alternate text,https://dequeuniversity.com/rules/axe/4.10/image-alt?application=playwright,critical,"<img src=""logo.png"">",img,any,6
+label,critical,cat.forms|wcag2a|wcag412|section508|section508.22.n|TTv5|TT5.c|EN-301-549|EN-9.4.1.2|ACT,Ensure every form element has a label,Form elements must have labels,https://dequeuniversity.com/rules/axe/4.10/label?application=playwright,critical,"<input style=""color: #ccc;"" type=""text"">",input,any,6
+landmark-one-main,moderate,cat.semantics|best-practice,Ensure the document has a main landmark,Document should have one main landmark,https://dequeuniversity.com/rules/axe/4.10/landmark-one-main?application=playwright,,"<html lang=""en""><head>
+  <title>
+   Test Page
+  </title>
+ </head>
+ <body>
+  <img src=""logo.png"">
+  <!-- Missing alt attribute -->
+  <input style=""color: #ccc;"" type=""text"">
+  <!-- Insufficient contrast -->
+ 
+
+</body></html>",html,any,6
+page-has-heading-one,moderate,cat.semantics|best-practice,"Ensure that the page, or at least one of its frames contains a level-one heading",Page should contain a level-one heading,https://dequeuniversity.com/rules/axe/4.10/page-has-heading-one?application=playwright,,"<html lang=""en""><head>
+  <title>
+   Test Page
+  </title>
+ </head>
+ <body>
+  <img src=""logo.png"">
+  <!-- Missing alt attribute -->
+  <input style=""color: #ccc;"" type=""text"">
+  <!-- Insufficient contrast -->
+ 
+
+</body></html>",html,any,6
+region,moderate,cat.keyboard|best-practice,Ensure all page content is contained by landmarks,All page content should be contained by landmarks,https://dequeuniversity.com/rules/axe/4.10/region?application=playwright,moderate,"<img src=""logo.png"">",img,any,6
+region,moderate,cat.keyboard|best-practice,Ensure all page content is contained by landmarks,All page content should be contained by landmarks,https://dequeuniversity.com/rules/axe/4.10/region?application=playwright,moderate,"<input style=""color: #ccc;"" type=""text"">",input,any,6

@@ -2,7 +2,7 @@ import io
 from typing import Any, Dict
 import aiofiles
 from fastapi import UploadFile
-
+from bs4 import BeautifulSoup
 import pandas as pd
 import asyncio
 import os
@@ -36,7 +36,7 @@ class CleanGPTModels:
 
     def _initialize_violation_file(self):
         """Initialize or clear the violation result file"""
-        headers = 'id,impact,tags,description,help,helpUrl,nodeImpact,nodeHtml,nodeTarget,nodeType,message,numViolation\n'
+        headers = 'id,impact,tags,description,help,helpUrl,nodeImpact,nodeHtml,nodeTarget,nodeType,numViolation\n'
         with open('violationResult.csv', 'w') as file:
             file.write(headers)
 
@@ -100,38 +100,30 @@ class CleanGPTModels:
         }}
 
         function violationsToCSV(violations) {{
-            const headers = ['id', 'impact', 'tags', 'description', 'help', 'helpUrl', 'nodeImpact', 'nodeHtml', 'nodeTarget', 'nodeType', 'message', 'numViolation'];
-            let csvContent = headers.join(',') + '\\n';               
+            const headers = ['id', 'impact', 'tags', 'description', 'help', 'helpUrl', 'nodeImpact', 'nodeHtml', 'nodeTarget', 'nodeType', 'numViolation'];
+            const uniqueRows = new Set();
             const totalViolations = violations.length;
 
             violations.forEach(violation => {{
                 violation.nodes.forEach(node => {{
-                    const nodeImpacts = ['any', 'all', 'none'];
-                    nodeImpacts.forEach(impactType => {{
-                        if (node[impactType] && node[impactType].length > 0) {{
-                            node[impactType].forEach(check => {{
-                                const row = [
-                                    escapeCSV(violation.id),
-                                    escapeCSV(violation.impact),
-                                    escapeCSV(violation.tags.join('|')),
-                                    escapeCSV(violation.description),
-                                    escapeCSV(violation.help),
-                                    escapeCSV(violation.helpUrl),
-                                    escapeCSV(check.impact || ''),
-                                    escapeCSV(node.html),
-                                    escapeCSV(node.target.join('|')),
-                                    escapeCSV(impactType),
-                                    escapeCSV(check.message),
-                                    escapeCSV(totalViolations)
-                                ];
-                                csvContent += row.join(',') + '\\n';
-                            }});
-                        }}
-                    }});
+                    const row = [
+                        escapeCSV(violation.id),
+                        escapeCSV(violation.impact),
+                        escapeCSV(violation.tags.join('|')),
+                        escapeCSV(violation.description),
+                        escapeCSV(violation.help),
+                        escapeCSV(violation.helpUrl),
+                        escapeCSV(node.any?.[0]?.impact || ''),
+                        escapeCSV(node.html),
+                        escapeCSV(node.target.join('|')),
+                        'any',
+                        totalViolations
+                    ];
+                    uniqueRows.add(row.join(','));
                 }});
             }});
-            
-            return csvContent;
+
+            return headers.join(',') + '\\n' + Array.from(uniqueRows).join('\\n');
         }}
 
         test('accessibility issues', async ({{ page }}) => {{
@@ -145,7 +137,7 @@ class CleanGPTModels:
             fileReader.writeFileSync("num_of_violations.txt", String(violations.length));
         }});
         """
-
+       
         # Step 3: Write the test script content to a .ts file
         test_script_path = "./tests/before.spec.ts"
         try:
@@ -212,17 +204,22 @@ class CleanGPTModels:
             # Normalize the DOM string by removing extra whitespace
             dom = ' '.join(dom.split())
 
-            # Populate error-fix dictionary with valid corrections only
+            # Populate error-fix dictionary with valid corrections
             for index, row in self.input_df.iterrows():
-                error = ' '.join(row['nodeHtml'].split())  # Normalize error string
-                fix = self.gpt_functions.get_correction(index)
-                if fix:
-                    # Handle different response formats
-                    if fix.startswith('[') and fix.endswith(']'):
-                        fix = fix[2:-2]  # Remove the outer brackets
-                    fix = ' '.join(fix.split())  # Normalize fix string
-                    if error and fix and error != fix:
-                        error_fix_dict[error] = fix
+                try:
+                    error = ' '.join(row['nodeHtml'].split())  # Normalize error string
+                    fix = self.gpt_functions.get_correction(index)
+                    
+                    if fix:
+                        # Standardize fix formatting
+                        fix = fix.strip('[]').strip()
+                        fix = ' '.join(fix.split())  # Normalize fix string
+                        
+                        if error and fix and error != fix:
+                            error_fix_dict[error] = fix
+                except Exception as row_error:
+                    print(f"Error processing row {index}: {row_error}")
+                    continue
 
             # Make a copy of the DOM to apply corrections
             dom_corrected = dom
@@ -232,9 +229,9 @@ class CleanGPTModels:
             
             for error in errors:
                 fix = error_fix_dict[error]
-                # Use case-insensitive search and replace
+                # Use case-insensitive search and replace with word boundaries
                 import re
-                pattern = re.compile(re.escape(error), re.IGNORECASE)
+                pattern = re.compile(r'\b' + re.escape(error) + r'\b', re.IGNORECASE)
                 dom_corrected = pattern.sub(fix, dom_corrected)
 
             # Store the corrected DOM in the DataFrame and as a class attribute
@@ -247,32 +244,27 @@ class CleanGPTModels:
             # Save the corrected DOM to a new file with proper error handling
             corrected_path = os.path.join('data', 'corrected.html')
             try:
-                # Pretty print the HTML before saving
-                from bs4 import BeautifulSoup
                 soup = BeautifulSoup(dom_corrected, 'html.parser')
                 formatted_html = soup.prettify()
                 
                 with open(corrected_path, 'w', encoding='utf-8') as corrected_file:
                     corrected_file.write(formatted_html)
                 print(f"Corrected DOM saved to {corrected_path}")
-            except IOError as e:
-                print(f"Error writing corrected DOM to file: {e}")
-                # Try alternative location if data directory is not accessible
-                alternative_path = 'corrected.html'
+            except Exception as file_error:
+                print(f"Error writing corrected DOM: {file_error}")
+                # Fallback: save without formatting
                 try:
-                    with open(alternative_path, 'w', encoding='utf-8') as corrected_file:
+                    with open(corrected_path, 'w', encoding='utf-8') as corrected_file:
                         corrected_file.write(dom_corrected)
-                    print(f"Corrected DOM saved to alternative location: {alternative_path}")
-                except IOError as e:
-                    print(f"Failed to save corrected DOM to alternative location: {e}")
-                    # At least keep the corrected DOM in memory
-                    print("Corrected DOM kept in memory but could not be saved to file")
+                    print("Saved corrected DOM without formatting")
+                except Exception as fallback_error:
+                    print(f"Fallback save failed: {fallback_error}")
 
         except Exception as e:
-            print(f"Error in create_corrected_dom_column: {e}")
-            # Ensure we still have a valid DOM in memory even if file operations fail
-            self.final_corrected_dom = dom if 'dom' in locals() else None
+            print(f"Critical error in create_corrected_dom_column: {e}")
+            self.final_corrected_dom = None
             raise
+
 
     def remove_files_starting_with(self, pattern):
         files_to_remove = glob.glob(pattern)
@@ -338,8 +330,7 @@ class CleanGPTModels:
                 'helpUrl': ['None'],
                 'nodeHtml': ['None'],
                 'nodeImpact': ['None'],
-                'nodeType': ['None'],
-                'message': ['None'],          
+                'nodeType': ['None'],      
                 'numViolations': [0]
             })
             df_temp = df_temp.reset_index(drop=True)
