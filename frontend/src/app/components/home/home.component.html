@@ -67,29 +67,30 @@
                     </button>
                 </div>
 
-                <div class="md:w-1/2 p-6 bg-gray-50 h-full">
+                <div class="md:w-1/2 p-6 bg-gray-50 h-full" role="region" aria-label="Code Analysis Report">
                     <h2 class="text-lg font-semibold text-gray-900 mb-4">Code Analysis Report</h2>
-                    <div class="bg-white p-4 rounded-md shadow-inner h-full overflow-y-auto"> <!-- Scrolls if content exceeds height -->
+                    <div class="bg-white p-4 rounded-md shadow-inner h-full overflow-y-auto" role="document"> <!-- Scrolls if content exceeds height -->
                         
                         <!-- Displaying the report as JSON -->
-                        <div *ngIf="report" class="text-sm text-gray-800 bg-gray-100 p-4 rounded-md space-y-2">
+                        <div *ngIf="report" class="text-sm text-gray-800 bg-gray-100 p-4 rounded-md space-y-2" role="alert">
                             <p><strong>Total Initial Severity Score:</strong> {{ report.total_initial_severity_score }}</p>
                             <p><strong>Total Final Severity Score:</strong> {{ report.total_final_severity_score }}</p>
                             <p><strong>Total Improvement (%):</strong> {{ report.total_improvement | number:'1.2-2' }}</p>
                         </div>
+                        <br>
                         
                         <!-- Displaying corrected HTML -->
-                        <div *ngIf="report?.corrected_html" class="bg-gray-100 p-4 rounded-md">
-                            <h3 class="font-semibold text-gray-800 mb-2">Corrected HTML</h3>
-                            <div class="overflow-x-auto">
-                                <pre class="text-sm text-gray-800 whitespace-pre-wrap">{{ report?.corrected_html }}</pre>
+                        <div *ngIf="report?.corrected_html" class="bg-gray-50 p-6 rounded-lg shadow-sm h-96" role="complementary">
+                            <h3 class="font-semibold text-gray-800 mb-4">Corrected HTML</h3>
+                            <div class="overflow-auto h-[calc(100%-3rem)] rounded-md">
+                              <pre class="text-sm text-gray-700 whitespace-pre-wrap font-mono">{{ report?.corrected_html }}</pre>
                             </div>
-                        </div>
-                        
+                          </div>
                         <!-- Fallback message -->
                         <p *ngIf="!report || !report.corrected_html" class="text-gray-500 italic">Your code analysis report will appear here.</p>
                     </div>
                 </div>
+                
                 
                                 
             </div>
