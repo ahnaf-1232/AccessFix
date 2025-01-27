@@ -7,6 +7,7 @@ import chromadb
 import json
 import openai
 from bs4 import BeautifulSoup
+from typing import Optional, Match
 
 
 class LLMFunctions:
@@ -52,8 +53,8 @@ class LLMFunctions:
                         documents=[doc]
                     )
 
-    def LLM_response(self, system, user, row_index):
-        print(f"\n...................................... Call : {row_index}...............................................")
+    def LLM_response(self, system, user):
+        # print(f"\n...................................... Call : {row_index}...............................................")
 
         prompt = [
             {"role": "system", "content": system},
@@ -67,7 +68,7 @@ class LLMFunctions:
                 {"role": "user", "content": user},
             ],
         )
-        print(f"Incorrect: {self.df['nodeHtml'][row_index]}")
+        # print(f"Incorrect: {self.df['nodeHtml'][row_index]}")
         print(f"Response: {response.choices[0].message.content}")
         return response.choices[0].message.content
     
@@ -76,59 +77,75 @@ class LLMFunctions:
         
         # return content
 
-    def generate_prompt(self, row_index):
+    def generate_prompt(self, row_index, guideline):
         system_msg = """You are an assistant who will correct web accessibility issues of a provided website.
-                I will provide you with an incorrect line of HTML and relevant information from a knowledge base. Provide a correction in the following format:
+                I will provide you with an incorrect line of HTML and some guidelines for that. Provide a correction in [['response']] format without any extra. Do not respond in any other format.
+                Here are a few examples:
 
-                Correct: [['corrected HTML here']]
+                E.g.
+                Incorrect: [['<h3></h3>']]
+                Issue: There must be some form of text between heading tags. 
+                Guideline: WCAG 2.4.6: Headings and Labels - Provide headings and labels that describe topic or purpose.
+                Correct: [['<h3>Some heading text</h3>']]
 
-                Do not add anything else in the response.
+                Incorrect: [['<img src="image.png">']]
+                Issue: The images lack an alt description. 
+                Guideline: WCAG 1.1.1: Non-text Content - All non-text content that is presented to the user has a text alternative that serves the equivalent purpose.
+                Correct: [['<img src="image.png" alt="Description">']]
+
+                Incorrect: [['<div id="accessibilityHome">\n<a aria-label="Accessibility overview" href="https://explore.zoom.us/en/accessibility">Accessibility Overview</a>\n</div>']]
+                Issue: The links have an unclear purpose based on the link text alone.
+                Guideline: WCAG 2.4.4: Link Purpose (In Context) - The purpose of each link can be determined from the link text alone or from the link text together with its programmatically determined link context.
+                Correct: [['<div id="accessibilityHome" role="navigation">\n<a aria-label="Accessibility overview" href="https://explore.zoom.us/en/accessibility">Accessibility Overview</a>\n</div>']]
         """
 
         user_msg = f"""
         Provide a correction for the following. Do not add anything else in the response.
-
+        Error: {self.df['id'][row_index]}
         Incorrect: {self.df['nodeHtml'][row_index]}
         Issue: {self.df['description'][row_index]}
-
-        Relevant information from the knowledge base:
-        {self.get_relevant_data(self.df['description'][row_index])}
+        Guideline: {guideline}
+        Suggested change: {self.df['help'][row_index]}
         """
         return system_msg, user_msg
 
-    def get_relevant_data(self, issue_description):
+    # def get_relevant_data(self, issue_description):
+    #     response = ollama.embeddings(
+    #         prompt=issue_description,
+    #         model="mxbai-embed-large"
+    #     )
+
+    #     results = self.collection.query(
+    #         query_embeddings=[response["embedding"]],
+    #         n_results=3
+    #     )
+    #     data = "\n\n".join(results['documents'][0])
+    #     return data
+
+    def get_correction(self, row_index: int):
+        query_prompt = f"What are the guidelines related to {self.df['description'][row_index]} in accessibility?"
+
         response = ollama.embeddings(
-            prompt=issue_description,
+            prompt=query_prompt, 
             model="mxbai-embed-large"
         )
-
         results = self.collection.query(
-            query_embeddings=[response["embedding"]],
-            n_results=3
+            query_embeddings=[response["embedding"]], n_results=3
         )
-        data = "\n\n".join(results['documents'][0])
-        return data
+        retrieved_data = results["documents"][0][0]  # Assume correct retrieval for simplicity
 
-    def get_correction(self, row_index):
-        system_msg, user_msg = self.generate_prompt(row_index)
-        response = self.LLM_response(system_msg, user_msg, row_index)
+        system_msg, user_msg = self.generate_prompt(row_index, retrieved_data)
+        response = self.LLM_response(system_msg, user_msg)
 
-        match = re.search(r"Correct:\s*\[\[(.*?)\]\]", response, re.DOTALL)
-        if match:
-            print("Correction found: ", match.group(1))
-            corrected_content = match.group(1).strip()
-            corrected_content = re.sub(r'\s*\n\s*', ' ', corrected_content)
-            corrected_content = re.sub(r'\s*=\s*', '=', corrected_content) 
-            corrected_content = re.sub(r'\s+', ' ', corrected_content)
-            print("Corrected content: ", corrected_content)
-            return corrected_content
-     
-            
+        # Adjusted regex pattern to handle single quotes and correct formatting without "Correct:" prefix
+        correct_headers: Optional[Match[str]] = re.search(r"\[\['(.*?)'\]\]", response)
+
+        if correct_headers:
+            print("Correction found:", correct_headers.group(1))
+            return correct_headers.group(1)
         else:
             print("No correction found; returning original HTML.")
-            corrected_content = self.df['nodeHtml'][row_index]
-
-        return corrected_content
+            return self.df['nodeHtml'][row_index]
 
 
 gpt_functions = LLMFunctions()
