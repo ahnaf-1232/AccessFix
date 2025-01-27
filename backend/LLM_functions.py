@@ -13,7 +13,7 @@ class LLMFunctions:
     def __init__(self):
         if not os.path.exists('violationResult.csv'):
             with open('violationResult.csv', 'w') as file:
-                file.write('id,impact,tags,description,help,helpUrl,nodeImpact,nodeHtml,nodeTarget,nodeType,message,numViolation\n')
+                file.write('id,impact,tags,description,help,helpUrl,nodeImpact,nodeHtml,nodeTarget,nodeType,numViolation\n')
         self.df = pd.read_csv('violationResult.csv')
         self.client = chromadb.Client()
         self.collection = self.get_or_create_collection("wcag_docs")
@@ -117,24 +117,11 @@ class LLMFunctions:
         if match:
             corrected_content = match.group(1).strip()
             corrected_content = re.sub(r'[\'\"\n]', '', corrected_content)
+     
+            
         else:
             print("No correction found; returning original HTML.")
             corrected_content = self.df['nodeHtml'][row_index]
-
-        # # Update HTML file
-        # corrected_file_path = os.path.join('data', 'corrected.html')
-        
-        # # Read entire file content
-        # with open(corrected_file_path, 'r', encoding='utf-8') as file:
-        #     file_content = file.read()
-
-        # # Replace entire old content with new content
-        # old_content = self.df['nodeHtml'][row_index]
-        # updated_content = file_content.replace(old_content, corrected_content)
-
-        # # Write updated content back
-        # with open(corrected_file_path, 'w', encoding='utf-8') as file:
-        #     file.write(updated_content)
 
         return corrected_content
 

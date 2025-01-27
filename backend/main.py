@@ -34,7 +34,7 @@ chat_gpt = ChatGPT()
 @app.post("/analyzeCode")
 async def analyze_code(request: CodeAnalysisRequest):
     try:
-        logging.info(f"Received code for analysis: {request.code}")
+        # logging.info(f"Received code for analysis: {request.code}")
         result = analyzeCode(request.code)
         return result
     except Exception as e:
@@ -44,7 +44,7 @@ async def analyze_code(request: CodeAnalysisRequest):
 @app.post("/analyzeUrl")
 async def analyze_url(request: UrlAnalysisRequest) -> Any:
     try:
-        logging.info(f"Received URL for analysis: {request.url}")
+        # logging.info(f"Received URL for analysis: {request.url}")
         result = analyzeURL(request.url)
         return result
     except Exception as e:
@@ -54,7 +54,7 @@ async def analyze_url(request: UrlAnalysisRequest) -> Any:
 @app.post("/analyzeFile")
 async def analyze_file(file: UploadFile = File(...)):
     try:
-        logging.info(f"Received file content for analysis: {file.filename}")
+        # logging.info(f"Received file content for analysis: {file.filename}")
         content = await file.read()
         result = analyzeCodeFromFile(content, file.filename)
         return result

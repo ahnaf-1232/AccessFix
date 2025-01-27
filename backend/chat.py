@@ -12,7 +12,7 @@ class ChatGPT:
             response = openai.chat.completions.create(
                 model="gpt-4-turbo",  # Make sure the model is correctly named
                 messages=[
-                    {"role": "system", "content": "You are a helpful assistant to give solutions for web accessibility problems. give guidelines for code modification to make it more accessible."},
+                    {"role": "system", "content": "You are a helpful assistant to give solutions for web accessibility problems. give guidelines for code modification to make it more accessible. Answer in short ans specific sentences."},
                     {"role": "user", "content": message}
                 ]
             )

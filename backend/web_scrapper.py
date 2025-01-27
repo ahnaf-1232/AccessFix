@@ -27,3 +27,15 @@ def save_code_to_path(code, path):
         f.write(soup.prettify())
     
     print(f"HTML content has been saved to {path}")
+
+# def save_code_to_path(code, path):
+#     print("Processing the HTML code...")
+    
+#     # Ensure the directory exists where the file will be saved
+#     os.makedirs(os.path.dirname(path), exist_ok=True)
+    
+#     # Open the file in write mode and write the HTML code directly
+#     with open(path, 'w', encoding='utf-8') as f:
+#         f.write(code)
+    
+#     print(f"HTML content has been saved to {path}")

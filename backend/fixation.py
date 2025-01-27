@@ -14,6 +14,7 @@ from dotenv import load_dotenv
 from LLM_functions import LLMFunctions
 from web_scrapper import fetch_and_save_data, save_code_to_path
 from file_handler import FileExtractor
+import re
 
 
 def run_playwright_test():
