@@ -53,7 +53,7 @@ class LLMFunctions:
                     )
 
     def LLM_response(self, system, user, row_index):
-        # print(f"\n...................................... Call : {row_index}...............................................")
+        print(f"\n...................................... Call : {row_index}...............................................")
 
         prompt = [
             {"role": "system", "content": system},
@@ -67,7 +67,8 @@ class LLMFunctions:
                 {"role": "user", "content": user},
             ],
         )
-        
+        print(f"Incorrect: {self.df['nodeHtml'][row_index]}")
+        print(f"Response: {response.choices[0].message.content}")
         return response.choices[0].message.content
     
         # response = ollama.chat(model='codegemma:latest', messages=prompt)
@@ -112,15 +113,13 @@ class LLMFunctions:
         system_msg, user_msg = self.generate_prompt(row_index)
         response = self.LLM_response(system_msg, user_msg, row_index)
 
-        # Extract correction
         match = re.search(r"Correct:\s*\[\[(.*?)\]\]", response, re.DOTALL)
         if match:
             print("Correction found: ", match.group(1))
             corrected_content = match.group(1).strip()
-            # Remove new lines and unnecessary spaces around '=' and inside tags
-            corrected_content = re.sub(r'\s*\n\s*', ' ', corrected_content)  # replace new lines with a single space
-            corrected_content = re.sub(r'\s*=\s*', '=', corrected_content)  # remove spaces around '='
-            corrected_content = re.sub(r'\s+', ' ', corrected_content)  # collapse multiple spaces into one
+            corrected_content = re.sub(r'\s*\n\s*', ' ', corrected_content)
+            corrected_content = re.sub(r'\s*=\s*', '=', corrected_content) 
+            corrected_content = re.sub(r'\s+', ' ', corrected_content)
             print("Corrected content: ", corrected_content)
             return corrected_content
      

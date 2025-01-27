@@ -9,6 +9,7 @@ import { HttpClient } from '@angular/common/http';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent {
+
   report: Analysis | null = null;
   title: string = 'AccessFix';
   code: string = '';
@@ -23,6 +24,17 @@ export class HomeComponent {
   userInput = '';
 
   constructor(private codeAnalysisService: AnalysisService, private http: HttpClient) {}
+
+  copyCodeToClipboard() {
+    if (this.report && this.report.corrected_html) {
+      navigator.clipboard.writeText(this.report.corrected_html).then(() => {
+        // You can add a notification here to inform the user that the code was copied
+        console.log('Code copied to clipboard');
+      }, (err) => {
+        console.error('Could not copy text: ', err);
+      });
+    }
+  }
 
   handleSubmit(): void {
     this.errorMessage = '';
