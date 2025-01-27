@@ -129,7 +129,8 @@ class CleanGPTModels:
 
         test('accessibility issues', async ({{ page }}) => {{
             await page.setContent(`{dom}`);
-            const accessibilityScanResults = await new AxeBuilder({{ page }}).analyze();
+            const accessibilityScanResults = await new AxeBuilder({{ page }})
+            .analyze();
             const violations = accessibilityScanResults.violations;
 
             // Write CSV data to file (overwrite mode)
@@ -196,29 +197,46 @@ class CleanGPTModels:
             self.final_corrected_dom = None
             return
 
+        error_fix_dict = {}
+
         try:
+            # Read the initial DOM content
             with open(path, 'r', encoding='utf-8') as text_file:
                 dom = text_file.read()
-
-            # Correct specific parts manually to avoid BeautifulSoup's auto-formatting
-            corrections = {
-                '<img src="logo.png"/>': '<div role="banner"><img src="logo.png" alt="Company Logo"/></div>'
-            }
-
-            # Apply corrections directly to the DOM string
-            for old, new in corrections.items():
-                dom = dom.replace(old, new)
-
-            # Use BeautifulSoup for general parsing and cleaning, not for specific corrections
+            
             soup = BeautifulSoup(dom, 'html.parser')
-            corrected_dom = str(soup)  # Convert directly to string, without prettifying
+            
+            # Iterate through identified errors and prepare fixes
+            for index, row in self.input_df.iterrows():
+                error = ' '.join(row['nodeHtml'].split())
+                error_html = BeautifulSoup(error, 'html.parser')
+                error = str(error_html)
+                print(f"Error {index}: {error}\n")
+
+                fix = self.gpt_functions.get_correction(index)
+                if fix:
+                    # Check if the fix is surrounded by single quotes and remove them
+                    fix = fix.strip("'")
+                    print(f"Fix for error {index}: {fix}\n")
+                    if error and fix and error != fix:
+                        error_fix_dict[error] = fix
+
+            # Apply all collected fixes
+            for error, fix in error_fix_dict.items():
+                # Direct replacement without re-parsing the content
+                dom = dom.replace(error, fix)
+                print(f"Applying fix: {error}  --> {fix}\n")
+
+            # Convert to BeautifulSoup object for light cleanup and ensure structure is correct
+            corrected_soup = BeautifulSoup(dom, 'html.parser')
+            corrected_dom = str(corrected_soup)
 
             print(f"Corrected DOM: {corrected_dom}")
 
             self.input_df['DOMCorrected'] = corrected_dom
             self.final_corrected_dom = corrected_dom
 
-            # Save the corrected DOM
+            # Save the corrected and minimally altered DOM to file
             corrected_path = os.path.join('data', 'corrected.html')
             os.makedirs('data', exist_ok=True)
             with open(corrected_path, 'w', encoding='utf-8') as corrected_file:
@@ -229,8 +247,6 @@ class CleanGPTModels:
             print(f"Critical error in create_corrected_dom_column: {e}")
             self.final_corrected_dom = None
             raise
-
-
 
 
 
@@ -255,7 +271,9 @@ class CleanGPTModels:
 
                 test('all violations', async ({{ page }}) => {{
                     await page.setContent(`{corrected_dom}`)
-                    const accessibilityScanResults = await new AxeBuilder({{ page }}).analyze();
+                    const accessibilityScanResults = await new AxeBuilder({{ page }})
+                    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+                    .analyze();
                     const violations = accessibilityScanResults.violations;
 
                     fileReader.writeFile("num_of_violations.txt", String(violations.length), function(err) {{

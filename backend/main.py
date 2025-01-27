@@ -8,7 +8,7 @@ from chat import ChatGPT
 
 app = FastAPI()
 
-logging.basicConfig(level=logging.INFO)
+# logging.basicConfig(level=logging.INFO)
 
 # Configure CORS
 app.add_middleware(

@@ -53,7 +53,7 @@ class LLMFunctions:
                     )
 
     def LLM_response(self, system, user, row_index):
-        print(f"\n...................................... Call : {row_index}...............................................")
+        # print(f"\n...................................... Call : {row_index}...............................................")
 
         prompt = [
             {"role": "system", "content": system},
@@ -115,8 +115,14 @@ class LLMFunctions:
         # Extract correction
         match = re.search(r"Correct:\s*\[\[(.*?)\]\]", response, re.DOTALL)
         if match:
+            print("Correction found: ", match.group(1))
             corrected_content = match.group(1).strip()
-            corrected_content = re.sub(r'[\'\"\n]', '', corrected_content)
+            # Remove new lines and unnecessary spaces around '=' and inside tags
+            corrected_content = re.sub(r'\s*\n\s*', ' ', corrected_content)  # replace new lines with a single space
+            corrected_content = re.sub(r'\s*=\s*', '=', corrected_content)  # remove spaces around '='
+            corrected_content = re.sub(r'\s+', ' ', corrected_content)  # collapse multiple spaces into one
+            print("Corrected content: ", corrected_content)
+            return corrected_content
      
             
         else:
