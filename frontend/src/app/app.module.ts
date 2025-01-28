@@ -5,7 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './components/home/home.component';
 import { HttpClientModule } from '@angular/common/http';
-import { GoogleChartsModule } from 'angular-google-charts';
+import { NgApexchartsModule } from 'ng-apexcharts';
 
 @NgModule({
   declarations: [
@@ -17,7 +17,7 @@ import { GoogleChartsModule } from 'angular-google-charts';
     AppRoutingModule,
     HttpClientModule,
     FormsModule,
-    GoogleChartsModule
+    NgApexchartsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

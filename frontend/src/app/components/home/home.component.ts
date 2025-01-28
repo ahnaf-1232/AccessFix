@@ -1,8 +1,32 @@
-import { Component } from "@angular/core"
-import { AnalysisService } from "../../services/analysis.service"
-import type { Analysis } from "src/app/models/analysis"
-import { HttpClient } from "@angular/common/http"
-import { trigger, transition, style, animate } from "@angular/animations"
+import { Component, OnInit } from "@angular/core";
+import { AnalysisService } from "../../services/analysis.service";
+import type { Analysis } from "src/app/models/analysis";
+import { trigger, transition, style, animate } from "@angular/animations";
+import type {
+  ApexAxisChartSeries,
+  ApexChart,
+  ApexDataLabels,
+  ApexPlotOptions,
+  ApexYAxis,
+  ApexLegend,
+  ApexStroke,
+  ApexXAxis,
+  ApexFill,
+  ApexTooltip,
+} from "ng-apexcharts";
+
+export type ChartOptions = {
+  series: ApexAxisChartSeries | ApexAxisChartSeries[];
+  chart: ApexChart;
+  dataLabels: ApexDataLabels;
+  plotOptions: ApexPlotOptions;
+  yaxis: ApexYAxis;
+  xaxis: ApexXAxis;
+  fill: ApexFill;
+  tooltip: ApexTooltip;
+  stroke: ApexStroke;
+  legend: ApexLegend;
+};
 
 @Component({
   selector: "app-home",
@@ -18,193 +42,157 @@ import { trigger, transition, style, animate } from "@angular/animations"
     ]),
   ],
 })
-export class HomeComponent {
-  report: Analysis | null = null
-  title = "AccessFix"
-  code = ""
-  url = ""
-  fileContent: File | null = null
-  errorMessage = ""
-  selectedFileName = "Select a file"
-  loading = false
+export class HomeComponent implements OnInit {
+  report: Analysis | null = null;
+  title = "AccessFix";
+  code = "";
+  url = "";
+  fileContent: File | null = null;
+  errorMessage = "";
+  selectedFileName = "Select a file";
+  loading = false;
 
-  showChat = false
-  messages: { text: string; sender: string }[] = []
-  userInput = ""
-  cardStates: boolean[] = []
+  showChat = false;
+  messages: { text: string; sender: string }[] = [];
+  userInput = "";
 
-  constructor(
-    private codeAnalysisService: AnalysisService,
-    private http: HttpClient,
-  ) { }
+  pieChartOptions: Partial<ChartOptions> | any;
+  barChartOptions: Partial<ChartOptions> | any;
 
-  chartOptions = {
-    title: 'Severity Levels',
-    is3D: true,
-  };
+  constructor(private codeAnalysisService: AnalysisService) {}
 
-  levelChartData: any[] = [];
-
-  toggleCard(index: number) {
-    this.cardStates[index] = !this.cardStates[index]
+  ngOnInit(): void {
+    // Load initial data or perform setup tasks
   }
 
   calculateLevelChartData(): void {
     if (!this.report || !this.report.csv_file_path) {
       return;
     }
+
     const levels = this.report.csv_file_path.reduce((acc: { [key: string]: number }, item) => {
       acc[item.level] = (acc[item.level] || 0) + 1;
       return acc;
     }, {});
 
-    this.levelChartData = Object.entries(levels).map(([key, value]) => [key, value]);
+    this.pieChartOptions = {
+      series: Object.values(levels),
+      chart: {
+        type: "pie",
+        height: 350,
+      },
+      labels: Object.keys(levels),
+      responsive: [{
+        breakpoint: 480,
+        options: {
+          chart: {
+            width: 200,
+          },
+          legend: {
+            position: "bottom",
+          },
+        },
+      }],
+    };
   }
 
-  copyCodeToClipboard() {
-    if (this.report && this.report.corrected_html) {
-      navigator.clipboard.writeText(this.report.corrected_html).then(
-        () => {
-          // You can add a notification here to inform the user that the code was copied
-          console.log("Code copied to clipboard")
+  initCharts(): void {
+    this.calculateLevelChartData(); // Make sure data is ready
+
+    // Bar Chart Initialization might depend on another type of data processing
+    this.barChartOptions = {
+      series: [{
+        data: [10, 20, 30, 40] // Example data
+      }],
+      chart: {
+        type: "bar",
+        height: 350,
+      },
+      xaxis: {
+        categories: ["Type 1", "Type 2", "Type 3", "Type 4"],
+      },
+      plotOptions: {
+        bar: {
+          horizontal: false,
         },
-        (err) => {
-          console.error("Could not copy text: ", err)
+      },
+      responsive: [{
+        breakpoint: 480,
+        options: {
+          chart: {
+            width: 200,
+          },
+          plotOptions: {
+            bar: {
+              horizontal: true,
+            },
+          },
         },
-      )
-    }
+      }],
+    };
   }
 
   handleSubmit(): void {
-    this.errorMessage = ""
-    this.loading = true
-    this.report = null
+    this.errorMessage = "";
+    this.loading = true;
+    this.report = null;
 
-    if (this.code) {
-      this.codeAnalysisService.analyzeCode(this.code).subscribe(
-        response => {
-          console.log('Received response:', response); 
-          this.report = response;
-          console.log(this.report?.csv_file_path); 
-          this.loading = false;
-        },
-        error => {
-          console.error('Error during code analysis:', error);
-          this.loading = false;
-        }
-      );
-
-    } else if (this.url) {
-      this.codeAnalysisService.analyzeUrl(this.url).subscribe(
-        (response) => {
-          this.report = response
-          // this.clearFields();
-          this.loading = false
-        },
-        (error) => {
-          this.errorMessage = "Error analyzing URL."
-          this.loading = false
-        },
-      )
-    } else if (this.fileContent) {
-      const file = this.fileContent // Directly use the file here, not FormData
-
-      // Send file object to analyzeFile method
-      this.codeAnalysisService.analyzeFile(file).subscribe(
-        (response) => {
-          this.report = response
-          // this.clearFields();
-          this.loading = false
-        },
-        (error) => {
-          this.errorMessage = "Error analyzing file."
-          this.loading = false
-        },
-      )
-    } else {
-      this.errorMessage = "Please enter code, select a file, or enter a URL."
-      this.loading = false
-    }
+    this.codeAnalysisService.analyzeCode(this.code).subscribe(
+      response => {
+        this.report = response;
+        this.initCharts();
+        this.loading = false;
+      },
+      error => {
+        this.errorMessage = 'Error analyzing code. Please try again.';
+        this.loading = false;
+      }
+    );
   }
 
-  handleFileChange(input: any): void {
-    const file = input.files[0]
+  handleFileChange(event: any): void {
+    const file = event.target.files[0];
     if (file) {
-      this.fileContent = file
-      this.code = "" // Clear code if file is selected
-      this.selectedFileName = file.name
+      this.fileContent = file;
+      this.selectedFileName = file.name;
+      this.code = ""; // Clear existing code if file is selected
     } else {
-      this.errorMessage = "Please select a valid file."
-      this.selectedFileName = "Select a file"
+      this.errorMessage = "Please select a valid file.";
+      this.selectedFileName = "Select a file";
     }
   }
 
-  toggleChat() {
-    this.showChat = !this.showChat
-    if (!this.showChat) {
-      this.messages = [] // Clean chat when closed
-    }
+  toggleChat(): void {
+    this.showChat = !this.showChat;
   }
 
-  sendMessage() {
+  sendMessage(): void {
     if (this.userInput.trim()) {
-      const userInput = this.userInput.trim()
-      this.messages.push({ text: userInput, sender: "user" })
+      const message = this.userInput.trim();
+      this.messages.push({ text: message, sender: "user" });
 
-      this.codeAnalysisService.chatResponse(userInput).subscribe(
-        (response) => {
-          this.messages.push({ text: response.text, sender: "bot" })
-          this.userInput = ""
-        },
-        (error) => {
-          console.error(`Error fetching response: ${error}`) // Debug error
-          this.errorMessage = "Error fetching response."
-        },
-      )
+      // Simulate a response for demonstration
+      setTimeout(() => {
+        this.messages.push({ text: "Echo: " + message, sender: "bot" });
+        this.userInput = "";
+      }, 500);
     }
   }
 
-  downloadReport() {
-    if (!this.report || !this.report.csv_file_path) {
-      console.error("No report data available")
-      return
+  downloadReport(): void {
+    if (!this.report) {
+      console.error("No report data available to download");
+      return;
     }
 
-    let reportContent = "Accessibility Analysis Report\n\n"
-    reportContent += `Total Initial Severity Score: ${this.report.total_initial_severity_score}\n`
-    reportContent += `Total Final Severity Score: ${this.report.total_final_severity_score}\n`
-    reportContent += `Total Improvement: ${this.report.total_improvement.toFixed(2)}%\n\n`
-
-    reportContent += "Guideline Details:\n\n"
-
-    this.report.csv_file_path.forEach((detail, index) => {
-      reportContent += `${index + 1}. Error: ${detail.error}\n`
-      reportContent += `   Level: ${detail.level}\n`
-      reportContent += `   Reference: ${detail.reference}\n`
-      reportContent += `   Fix: ${detail.fix}\n`
-      reportContent += `   Description: ${detail.description}\n\n`
-    })
-
-    reportContent += "Corrected HTML:\n\n"
-    reportContent += this.report.corrected_html
-
-    const blob = new Blob([reportContent], { type: "text/plain" })
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = "accessibility_report.txt"
-    document.body.appendChild(a)
-    a.click()
-    window.URL.revokeObjectURL(url)
-    document.body.removeChild(a)
-  }
-
-
-  clearFields(): void {
-    this.code = ""
-    this.url = ""
-    this.fileContent = null
-    this.selectedFileName = "Select a file"
+    const blob = new Blob([JSON.stringify(this.report, null, 2)], { type: "text/plain" });
+    const url = window.URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "report.txt";
+    document.body.appendChild(anchor);
+    anchor.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(anchor);
   }
 }
-
