@@ -379,17 +379,21 @@ class CleanGPTModels:
         if os.path.exists(corrected_file_path):
             with open(corrected_file_path, 'r', encoding='utf-8') as f:
                 corrected_html = f.read()
+                
+        csv_file_path = os.path.join('data', 'guideline_details.csv')
 
-        print(f"Total initial severity score: {total_initial_severity_score}")
-        print(f"Total final severity score: {total_final_severity_score}")
-        print(f"Total improvement: {total_improvement}")
-        print(f"Corrected HTML: {corrected_html}")
+        # print(f"Total initial severity score: {total_initial_severity_score}")
+        # print(f"Total final severity score: {total_final_severity_score}")
+        # print(f"Total improvement: {total_improvement}")
+        # print(f"Corrected HTML: {corrected_html}")
 
         return {
             "total_initial_severity_score": int(total_initial_severity_score) if isinstance(total_initial_severity_score, np.integer) else total_initial_severity_score,
             "total_final_severity_score": int(total_final_severity_score) if isinstance(total_final_severity_score, np.integer) else total_final_severity_score,
             "total_improvement": float(total_improvement) if isinstance(total_improvement, (np.integer, np.floating)) else total_improvement,
             "corrected_html": corrected_html,
+            "csv_file_path": csv_file_path
+
         }
     
     def analyze_violations_from_code(self, code, path):
@@ -417,12 +421,21 @@ class CleanGPTModels:
         if os.path.exists(corrected_file_path):
             with open(corrected_file_path, 'r', encoding='utf-8') as f:
                 corrected_html = f.read()
+                
+        csv_file_path = os.path.join('data', 'guideline_details.csv')
+        
+        if os.path.exists(csv_file_path):
+            csv_data = pd.read_csv(csv_file_path)
+            csv_content = csv_data.to_dict(orient='records')
+        else:
+            csv_content = [] 
 
         return {
             "total_initial_severity_score": int(total_initial_severity_score) if isinstance(total_initial_severity_score, np.integer) else total_initial_severity_score,
             "total_final_severity_score": int(total_final_severity_score) if isinstance(total_final_severity_score, np.integer) else total_final_severity_score,
             "total_improvement": float(total_improvement) if isinstance(total_improvement, (np.integer, np.floating)) else total_improvement,
             "corrected_html": corrected_html, 
+            "csv_file_path": csv_content
 
         }
 

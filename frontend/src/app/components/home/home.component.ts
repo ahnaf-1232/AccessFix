@@ -44,13 +44,18 @@ export class HomeComponent {
     if (this.code) {
       this.codeAnalysisService.analyzeCode(this.code).subscribe(
         response => {
-          this.report = response;
-          // this.clearFields();
-          this.loading = false;
+          this.report = response; 
+          console.log(this.report);
+          // this.clearFields(); 
+          this.loading = false; 
+      
+          // console.log('Analysis completed successfully:', this.report);
         },
         error => {
-          this.errorMessage = 'Error analyzing code.';
-          this.loading = false;
+          // console.error('Error occurred during code analysis:', error);
+          this.errorMessage = 'Error analyzing code. Please try again.'; // More specific error message.
+          this.loading = false; // Ensure loading state is handled in case of error.
+      
         }
       );
     } else if (this.url) {

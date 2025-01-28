@@ -152,6 +152,15 @@ class LLMFunctions:
             return self.df['nodeHtml'][row_index]
 
     def store_guideline_details(self, index: int, errorCode: str, error: str, fix: str, ref: str, level: str, description: str):
+
+        data_folder = 'data'
+        if not os.path.exists(data_folder):
+            os.makedirs(data_folder)
+        
+        # Path to the CSV file within the data folder
+        csv_file_path = os.path.join(data_folder, 'guideline_details.csv')
+
+        # Data to be saved
         data = {
             'Index': index,
             "Error Code": errorCode,
@@ -161,11 +170,12 @@ class LLMFunctions:
             'Level': level,
             'Description': description
         }
-        try:
-            df = pd.DataFrame([data])
-            df.to_csv('guideline_details.csv', mode='a', header=not os.path.exists('guideline_details.csv'), index=False)
-            print("Guideline details saved.")
-        except Exception as e:
-            print(f"Failed to save guideline details: {e}")
+        
+        df = pd.DataFrame([data])
+        
+    
+        df.to_csv(csv_file_path, mode='a', header=not os.path.exists(csv_file_path), index=False)
+        
+        print(f"Guideline details saved to {csv_file_path}")
 
 gpt_functions = LLMFunctions()
