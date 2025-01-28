@@ -148,7 +148,7 @@ class LLMFunctions:
 
             return correct_headers.group(1)
         else:
-            print("No correction found; returning original HTML.")
+            # print("No correction found; returning original HTML.")
             return self.df['nodeHtml'][row_index]
 
     def store_guideline_details(self, index: int, errorCode: str, error: str, fix: str, ref: str, level: str, description: str):
@@ -162,13 +162,13 @@ class LLMFunctions:
 
         # Data to be saved
         data = {
-            'Index': index,
-            "Error Code": errorCode,
-            'Error': error,
-            'Fix': fix,
-            'Reference': ref,
-            'Level': level,
-            'Description': description
+            'index': index,
+            "errorCode": errorCode,
+            'error': error,
+            'fix': fix,
+            'reference': ref,
+            'level': level,
+            'description': description
         }
         
         df = pd.DataFrame([data])
@@ -176,6 +176,6 @@ class LLMFunctions:
     
         df.to_csv(csv_file_path, mode='a', header=not os.path.exists(csv_file_path), index=False)
         
-        print(f"Guideline details saved to {csv_file_path}")
+        # print(f"Guideline details saved to {csv_file_path}")
 
 gpt_functions = LLMFunctions()

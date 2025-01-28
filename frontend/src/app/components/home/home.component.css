@@ -1,23 +1,66 @@
-/* .user-msg {
-    text-align: right;
-    background-color: lightgray;
-    padding: 5px 10px;
-    border-radius: 12px;
-    display: flex;
-    justify-content: end;
-    align-items: center;
+/* Other CSS rules here */
+
+/* Guideline Details Styles */
+.guideline-card {
+  transition: all 0.3s ease-in-out;
+  border-left: 4px solid #10b981;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.bot-msg {
-    text-align: left;
-    background-color: lightblue;
-    padding: 5px 10px;
-    border-radius: 12px;
-    display: flex;
-    justify-content: start;
-    align-items: center;
+.guideline-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
-.fas.fa-user, .fas.fa-robot {
-    font-size: 1.2em;
-} */
+pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Custom scrollbar for code blocks */
+pre::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+pre::-webkit-scrollbar-track {
+  background: #2d3748;
+}
+
+pre::-webkit-scrollbar-thumb {
+  background-color: #4a5568;
+  border-radius: 4px;
+}
+
+pre::-webkit-scrollbar-thumb:hover {
+  background-color: #718096;
+}
+
+/* Level badge styles */
+.guideline-card span {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+}
+
+.guideline-card span:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Reference styles */
+.guideline-card a.text-blue-600 {
+  transition: all 0.3s ease-in-out;
+}
+
+.guideline-card a.text-blue-600:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Title and Description styles */
+.guideline-card h3,
+.guideline-card p {
+  padding: 0.5rem 0;
+}
+

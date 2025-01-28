@@ -3,7 +3,7 @@ interface GuidelineDetail {
     errorCode: string;
     error: string;
     fix: string;
-    reference: string;
+    reference: string;  
     level: string;
     description: string;
 }

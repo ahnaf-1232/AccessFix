@@ -27,6 +27,7 @@ def run_playwright_test():
         print(f"Error running Playwright test: {e}")
 
 
+
 class CleanGPTModels:
     def __init__(self):
         load_dotenv()
@@ -34,6 +35,8 @@ class CleanGPTModels:
         self.file_extractor = FileExtractor()
         self._initialize_violation_file()
         self.input_df = pd.DataFrame()
+        csv_guideline_file_path = os.path.join('data', 'guideline_details.csv')
+        self.clear_csv_file(csv_guideline_file_path)
 
     def _initialize_violation_file(self):
         """Initialize or clear the violation result file"""
@@ -70,6 +73,13 @@ class CleanGPTModels:
         except Exception as e:
             print(f"Error reading violation results: {e}")
             self.input_df = pd.DataFrame()
+
+    def clear_csv_file(self, file_path):
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        # print("CSV file cleared.")
+
+
 
     def create_test_script(self, path):   
         print("Creating the violation file...........")
@@ -222,7 +232,7 @@ class CleanGPTModels:
             for error, fix in error_fix_dict.items():
                 # Direct replacement without re-parsing the content
                 dom = dom.replace(error, fix)
-                print(f"Applying fix: {error}  --> {fix}\n")
+                # print(f"Applying fix: {error}  --> {fix}\n")
 
             # Convert to BeautifulSoup object for light cleanup and ensure structure is correct
             corrected_soup = BeautifulSoup(dom, 'html.parser')
