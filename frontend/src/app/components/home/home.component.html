@@ -1,4 +1,5 @@
-<div class="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 py-12 px-4 sm:px-6 lg:px-8" ng-controller="EditorController">
+<div class="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 py-12 px-4 sm:px-6 lg:px-8"
+    ng-controller="EditorController">
     <div class="max-w-7xl mx-auto">
         <h1 class="text-4xl font-extrabold text-center text-gray-900 mb-8">{{ title }}</h1>
         <div class="bg-white shadow-2xl rounded-lg overflow-hidden">
@@ -8,74 +9,77 @@
                         <label for="codeInput" class="block text-sm font-medium text-gray-700 mb-2">
                             Enter your code:
                         </label>
-                        <textarea
-                            id="codeInput"
+                        <textarea id="codeInput"
                             class="w-full h-64 p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out"
-                            [(ngModel)]="code"
-                            placeholder="Paste your code here..."
-                        ></textarea>
+                            [(ngModel)]="code" placeholder="Paste your code here..."></textarea>
                     </div>
                     <div class="mb-6">
                         <label for="fileInput" class="block text-sm font-medium text-gray-700 mb-2">
                             Or import a file:
                         </label>
                         <div class="flex items-center">
-                            <label class="w-full flex items-center px-4 py-2 bg-white text-indigo-600 rounded-lg shadow-md tracking-wide uppercase border border-indigo-600 cursor-pointer hover:bg-indigo-600 hover:text-white transition duration-300 ease-in-out">
-                                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            <label
+                                class="w-full flex items-center px-4 py-2 bg-white text-indigo-600 rounded-lg shadow-md tracking-wide uppercase border border-indigo-600 cursor-pointer hover:bg-indigo-600 hover:text-white transition duration-300 ease-in-out">
+                                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                    </path>
                                 </svg>
                                 <span class="text-base leading-normal">{{ selectedFileName || 'Choose a file' }}</span>
-                                <input 
-                                    type="file" 
-                                    class="hidden" 
-                                    (change)="handleFileChange($event.target)" 
-                                    aria-label="Upload a file to analyze"
-                                >
+                                <input type="file" class="hidden" (change)="handleFileChange($event.target)"
+                                    aria-label="Upload a file to analyze">
                             </label>
                         </div>
                     </div>
-                    
+
                     <div class="mb-6">
                         <label for="urlInput" class="block text-sm font-medium text-gray-700 mb-2">
                             Or enter a URL:
                         </label>
                         <div class="mt-1 flex rounded-md shadow-sm">
-                            <span class="inline-flex items-center px-3 py-2 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                            <span
+                                class="inline-flex items-center px-3 py-2 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1">
+                                    </path>
                                 </svg>
-                            </span>                            
-                            <input
-                                type="text"
-                                id="urlInput"
+                            </span>
+                            <input type="text" id="urlInput"
                                 class="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-r-md sm:text-sm border-gray-300"
-                                placeholder="https://example.com/code.js"
-                                [(ngModel)]="url"
-                            >
+                                placeholder="https://example.com/code.js" [(ngModel)]="url">
                         </div>
                     </div>
 
                     <!-- Display Error Message -->
                     <div *ngIf="errorMessage" class="text-red-500 mb-4 p-3 bg-red-100 rounded-md">
-                        <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        <svg class="w-5 h-5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         {{ errorMessage }}
                     </div>
-                    
+
                     <!-- Submit Button -->
-                    <button
-                        (click)="handleSubmit()"
+                    <button (click)="handleSubmit()"
                         class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out"
-                        aria-label="Analyze Code"
-                        [disabled]="loading"
-                    >
-                        <svg *ngIf="!loading" class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                        aria-label="Analyze Code" [disabled]="loading">
+                        <svg *ngIf="!loading" class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01">
+                            </path>
                         </svg>
-                        <svg *ngIf="loading" class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        <svg *ngIf="loading" class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg"
+                            fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                            </circle>
+                            <path class="opacity-75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
                         </svg>
                         <span *ngIf="!loading">Analyze Code</span>
                         <span *ngIf="loading">Analyzing...</span>
@@ -83,149 +87,127 @@
                 </div>
 
                 <div class="md:w-1/2 p-8 bg-gray-50" role="region" aria-label="Code Analysis Report">
-    <div *ngIf="loading" class="flex flex-col items-center justify-center h-64 space-y-4">
-        <div class="flex space-x-2">
-            <div class="w-4 h-4 bg-indigo-500 rounded-full animate-bounce"></div>
-            <div class="w-4 h-4 bg-indigo-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
-            <div class="w-4 h-4 bg-indigo-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
-        </div>
-        <p class="text-indigo-500 font-semibold">Processing...</p>
-    </div>
-    <div *ngIf="!loading">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-2xl font-semibold text-gray-900">Code Analysis Report</h2>
-            <button
-                *ngIf="report"
-                (click)="copyCodeToClipboard()"
-                class="px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-                    <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
-                </svg>
-                Copy Code
-            </button>
-        </div>
-        <div class="bg-white p-6 rounded-lg shadow-inner h-full overflow-y-auto" role="document">
-            
-            <!-- Displaying the report as JSON -->
-            <div *ngIf="report" class="text-sm text-gray-800 bg-gray-100 p-6 rounded-lg space-y-4" role="alert">
-                <p class="font-semibold">Analysis Results:</p>
-                <p><strong>Total Initial Severity Score:</strong> {{ report.total_initial_severity_score }}</p>
-                <p><strong>Total Final Severity Score:</strong> {{ report.total_final_severity_score }}</p>
-                <p><strong>Total Improvement (%):</strong> {{ report.total_improvement | number:'1.2-2' }}</p>
-            </div>
-            
-            <!-- Displaying corrected HTML -->
-            <div *ngIf="report?.corrected_html" class="mt-8">
-                <h3 class="font-semibold text-gray-800 mb-4">Corrected HTML</h3>
-                <div class="bg-gray-800 p-4 rounded-lg shadow-inner">
-                    <pre class="text-sm text-green-400 whitespace-pre-wrap font-mono overflow-x-auto">{{ report?.corrected_html }}</pre>
+                    <div *ngIf="loading" class="flex flex-col items-center justify-center h-64 space-y-4">
+                        <div class="flex space-x-2">
+                            <div class="w-4 h-4 bg-indigo-500 rounded-full animate-bounce"></div>
+                            <div class="w-4 h-4 bg-indigo-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                            <div class="w-4 h-4 bg-indigo-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                        </div>
+                        <p class="text-indigo-500 font-semibold">Processing...</p>
+                    </div>
+                    <div *ngIf="!loading">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-2xl font-semibold text-gray-900">Code Analysis Report</h2>
+                            <button *ngIf="report" (click)="copyCodeToClipboard()"
+                                class="px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9 a1 1 0 01-1-1z" />
+                                    <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5 a2 2 0 00-2-2 3 3 0 01-3 3H9 a3 3 0 01-3-3z" />
+                                </svg>
+                                Copy Code
+                            </button>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-inner h-full overflow-y-auto" role="document">
+                            <!-- Displaying the report as JSON -->
+                            <div *ngIf="report" class="text-sm text-gray-800 bg-gray-100 p-6 rounded-lg space-y-4" role="alert">
+                                <p class="font-semibold">Analysis Results:</p>
+                                <p><strong>Total Initial Severity Score:</strong> {{ report.total_initial_severity_score }}</p>
+                                <p><strong>Total Final Severity Score:</strong> {{ report.total_final_severity_score }}</p>
+                                <p><strong>Total Improvement (%):</strong> {{ report.total_improvement | number:'1.2-2' }}</p>
+                            </div>
+                            <!-- Displaying corrected HTML -->
+                            <div *ngIf="report?.corrected_html" class="mt-8 overflow-x-auto">
+                                <h3 class="font-semibold text-gray-800 mb-4">Corrected HTML</h3>
+                                <div class="bg-gray-800 p-4 rounded-lg shadow-inner overflow-x-auto overflow-y-auto">
+                                    <pre class="text-sm text-green-400 whitespace-pre-wrap font-mono" style="max-height: 300px;">{{ report?.corrected_html }}</pre>
+                                </div>
+                            </div>
+                            <!-- Fallback message -->
+                            <div *ngIf="!report" class="flex items-center justify-center h-full">
+                                <p class="text-gray-500 italic text-center">Your code analysis report will appear here once you submit your code.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            
-            <!-- Fallback message -->
-            <div *ngIf="!report" class="flex items-center justify-center h-full">
-                <p class="text-gray-500 italic text-center">Your code analysis report will appear here once you submit your code.</p>
-            </div>
-        </div>
-    </div>
-</div>
+                
+                
+                
             </div>
         </div>
     </div>
 
     <!-- Chat Button -->
     <div class="fixed bottom-8 right-8">
-        <button (click)="toggleChat()" class="bg-indigo-600 p-4 rounded-full text-white shadow-lg hover:bg-indigo-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+        <button (click)="toggleChat()"
+            class="bg-indigo-600 p-4 rounded-full text-white shadow-lg hover:bg-indigo-700 transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z">
+                </path>
             </svg>
         </button>
     </div>
 
     <!-- Chat Window -->
-    <div *ngIf="showChat" class="fixed bottom-24 right-8 w-96 h-[500px] bg-white border border-gray-300 rounded-xl overflow-hidden shadow-2xl flex flex-col">
+    <div *ngIf="showChat"
+        class="fixed bottom-24 right-8 w-96 h-[500px] bg-white border border-gray-300 rounded-xl overflow-hidden shadow-2xl flex flex-col">
         <div class="bg-indigo-600 text-white p-4 flex items-center justify-between">
             <h3 class="text-lg font-semibold">Chat Assistant</h3>
-            <button 
-                (click)="showChat = false" 
-                class="hover:bg-indigo-700 p-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <button (click)="showChat = false"
+                class="hover:bg-indigo-700 p-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
         </div>
-    
+
         <div class="flex-grow overflow-y-auto p-4 space-y-4">
-            <div *ngFor="let message of messages" class="flex" 
-                 [ngClass]="message.sender === 'user' ? 'justify-end' : 'justify-start'">
+            <div *ngFor="let message of messages" class="flex"
+                [ngClass]="message.sender === 'user' ? 'justify-end' : 'justify-start'">
                 <div class="flex items-start space-x-2 max-w-[80%]">
                     <div *ngIf="message.sender === 'bot'" class="flex-shrink-0">
-                        <svg 
-                            xmlns="http://www.w3.org/2000/svg" 
-                            class="h-8 w-8 rounded-full p-1 bg-green-100 text-green-600"
-                            viewBox="0 0 24 24" 
-                            fill="none" 
-                            stroke="currentColor"
-                        >
-                            <path 
-                                stroke-linecap="round" 
-                                stroke-linejoin="round" 
-                                stroke-width="2" 
-                                d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" 
-                            />
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-8 w-8 rounded-full p-1 bg-green-100 text-green-600" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
                         </svg>
                     </div>
-                    <div 
-                        class="rounded-lg p-3 {{ 
+                    <div class="rounded-lg p-3 {{ 
                             message.sender === 'user' 
                             ? 'bg-indigo-500 text-white' 
                             : 'bg-gray-200 text-gray-800' 
-                        }}"
-                    >
+                        }}">
                         {{ message.text }}
                     </div>
                     <div *ngIf="message.sender === 'user'" class="flex-shrink-0">
-                        <svg 
-                            xmlns="http://www.w3.org/2000/svg" 
-                            class="h-8 w-8 rounded-full p-1 bg-indigo-100 text-indigo-600"
-                            viewBox="0 0 24 24" 
-                            fill="none" 
-                            stroke="currentColor"
-                        >
-                            <path 
-                                stroke-linecap="round" 
-                                stroke-linejoin="round" 
-                                stroke-width="2" 
-                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" 
-                            />
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-8 w-8 rounded-full p-1 bg-indigo-100 text-indigo-600" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                     </div>
                 </div>
             </div>
         </div>
-    
+
         <div class="border-t border-gray-200 p-4">
             <div class="flex space-x-2">
-                <input 
-                    type="text" 
-                    [(ngModel)]="userInput" 
-                    (keyup.enter)="sendMessage()"
-                    class="flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" 
-                    placeholder="Type your message..."
-                >
-                <button 
-                    (click)="sendMessage()" 
-                    class="bg-indigo-600 text-white p-3 rounded-lg hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                <input type="text" [(ngModel)]="userInput" (keyup.enter)="sendMessage()"
+                    class="flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="Type your message...">
+                <button (click)="sendMessage()"
+                    class="bg-indigo-600 text-white p-3 rounded-lg hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                     </svg>
                 </button>
             </div>
         </div>
     </div>
 </div>
-

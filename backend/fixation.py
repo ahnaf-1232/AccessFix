@@ -1,6 +1,6 @@
 import io
 from typing import Any, Dict
-import aiofiles
+import json
 from fastapi import UploadFile
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -70,7 +70,6 @@ class CleanGPTModels:
         except Exception as e:
             print(f"Error reading violation results: {e}")
             self.input_df = pd.DataFrame()
-
 
     def create_test_script(self, path):   
         print("Creating the violation file...........")
@@ -171,7 +170,6 @@ class CleanGPTModels:
                 # time.sleep(0.5)
                 os.remove('num_of_violations.txt')
 
-
     def add_severity_score(self, df, column_name, insert_index):
         impact_values = {
             'critical': 5,
@@ -187,7 +185,6 @@ class CleanGPTModels:
 
     def calculate_severity_score(self, df, score):
         return df[score].sum()
-
 
     def create_corrected_dom_column(self, path):
         print("Correcting DOMs..........")
@@ -211,13 +208,13 @@ class CleanGPTModels:
                 error = ' '.join(row['nodeHtml'].split())
                 error_html = BeautifulSoup(error, 'html.parser')
                 error = str(error_html)
-                print(f"Error {index}: {error}\n")
+                # print(f"Error {index}: {error}\n")
 
                 fix = self.gpt_functions.get_correction(index)
                 if fix:
                     # Check if the fix is surrounded by single quotes and remove them
                     fix = fix.strip("'")
-                    print(f"Fix for error {index}: {fix}\n")
+                    # print(f"Fix for error {index}: {fix}\n")
                     if error and fix and error != fix:
                         error_fix_dict[error] = fix
 
@@ -231,7 +228,7 @@ class CleanGPTModels:
             corrected_soup = BeautifulSoup(dom, 'html.parser')
             corrected_dom = str(corrected_soup)
 
-            print(f"Corrected DOM: {corrected_dom}")
+            # print(f"Corrected DOM: {corrected_dom}")
 
             self.input_df['DOMCorrected'] = corrected_dom
             self.final_corrected_dom = corrected_dom
@@ -247,6 +244,10 @@ class CleanGPTModels:
             print(f"Critical error in create_corrected_dom_column: {e}")
             self.final_corrected_dom = None
             raise
+
+
+
+
 
 
 
@@ -312,8 +313,8 @@ class CleanGPTModels:
                             df_temp = pd.read_json(file, lines=True)
                         df_temp = df_temp.reset_index(drop=True)
                         new_df = pd.concat([new_df, df_temp], ignore_index=True)
-                    else:
-                        print(f"File not found: {file_path}")
+                    # else:
+                    #     print(f"File not found: {file_path}")
                 new_df.insert(1, "numViolations", length)
             else:
                 df_temp = pd.DataFrame({
@@ -342,7 +343,6 @@ class CleanGPTModels:
 
         new_df = self.add_severity_score(new_df, 'finalScore', 3)
         return new_df
-
 
     def call_corrections_to_violations(self, url):
         print("Violation result after corrections.....")
@@ -392,8 +392,6 @@ class CleanGPTModels:
             "corrected_html": corrected_html,
         }
     
-
-
     def analyze_violations_from_code(self, code, path):
         save_code_to_path(code, path)
         # time.sleep(1)
@@ -446,11 +444,12 @@ class CleanGPTModels:
             print(f"Error processing file: {str(e)}")
             raise ValueError(f"Failed to process file content: {str(e)}") from e
 
+
+
 def analyzeURL(url: str):
     model = CleanGPTModels()
     path = 'data/input.html'
     return model.analyze_violations_from_URL(url, path)
-
 
 def analyzeCode(code: str):
     model = CleanGPTModels()

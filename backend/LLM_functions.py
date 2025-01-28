@@ -42,7 +42,7 @@ class LLMFunctions:
                     
                     existing_ids.add(ref_id)
                     
-                    doc = f"WCAG: {ref_id} : {criterion['title']} - {criterion['description']}\n"
+                    doc = f"WCAG: {ref_id} : Level-{criterion['level']} - {criterion['title']} - {criterion['description']}\n"
                     
                     response = ollama.embeddings(model="mxbai-embed-large", prompt=doc)
                     embedding = response["embedding"]
@@ -68,13 +68,10 @@ class LLMFunctions:
                 {"role": "user", "content": user},
             ],
         )
-        # print(f"Incorrect: {self.df['nodeHtml'][row_index]}")
-        print(f"Response: {response.choices[0].message.content}")
         return response.choices[0].message.content
     
         # response = ollama.chat(model='codegemma:latest', messages=prompt)
-        # content = response['message']['content']
-        
+        # content = response['message']['content']        
         # return content
 
     def generate_prompt(self, row_index, guideline):
@@ -85,17 +82,17 @@ class LLMFunctions:
                 E.g.
                 Incorrect: [['<h3></h3>']]
                 Issue: There must be some form of text between heading tags. 
-                Guideline: WCAG 2.4.6: Headings and Labels - Provide headings and labels that describe topic or purpose.
+                Guideline: WCAG 2.4.6: Level-AA - Headings and Labels - Provide headings and labels that describe topic or purpose.
                 Correct: [['<h3>Some heading text</h3>']]
 
                 Incorrect: [['<img src="image.png">']]
                 Issue: The images lack an alt description. 
-                Guideline: WCAG 1.1.1: Non-text Content - All non-text content that is presented to the user has a text alternative that serves the equivalent purpose.
+                Guideline: WCAG 1.1.1: Level-A - Non-text Content - All non-text content that is presented to the user has a text alternative that serves the equivalent purpose.
                 Correct: [['<img src="image.png" alt="Description">']]
 
                 Incorrect: [['<div id="accessibilityHome">\n<a aria-label="Accessibility overview" href="https://explore.zoom.us/en/accessibility">Accessibility Overview</a>\n</div>']]
                 Issue: The links have an unclear purpose based on the link text alone.
-                Guideline: WCAG 2.4.4: Link Purpose (In Context) - The purpose of each link can be determined from the link text alone or from the link text together with its programmatically determined link context.
+                Guideline: WCAG 2.4.4: Level-A - Link Purpose (In Context) - The purpose of each link can be determined from the link text alone or from the link text together with its programmatically determined link context.
                 Correct: [['<div id="accessibilityHome" role="navigation">\n<a aria-label="Accessibility overview" href="https://explore.zoom.us/en/accessibility">Accessibility Overview</a>\n</div>']]
         """
 
@@ -122,9 +119,10 @@ class LLMFunctions:
     #     data = "\n\n".join(results['documents'][0])
     #     return data
 
-    def get_correction(self, row_index: int):
-        query_prompt = f"What are the guidelines related to {self.df['description'][row_index]} in accessibility?"
 
+    def get_correction(self, row_index: int) -> str:
+        query_prompt = f"What are the guidelines related to {self.df['description'][row_index]} in accessibility?"
+        
         response = ollama.embeddings(
             prompt=query_prompt, 
             model="mxbai-embed-large"
@@ -137,15 +135,37 @@ class LLMFunctions:
         system_msg, user_msg = self.generate_prompt(row_index, retrieved_data)
         response = self.LLM_response(system_msg, user_msg)
 
-        # Adjusted regex pattern to handle single quotes and correct formatting without "Correct:" prefix
         correct_headers: Optional[Match[str]] = re.search(r"\[\['(.*?)'\]\]", response)
 
         if correct_headers:
             print("Correction found:", correct_headers.group(1))
+            pattern = r"WCAG: (\S+) : Level-(\S+) - (.*?) -"
+            match: Optional[Match[str]] = re.search(pattern, retrieved_data)
+
+            if match:
+                ref, level, description = match.groups()
+                self.store_guideline_details(row_index, self.df['nodeHtml'][row_index], self.df['description'][row_index], correct_headers.group(1), ref, level, description)
+
             return correct_headers.group(1)
         else:
             print("No correction found; returning original HTML.")
             return self.df['nodeHtml'][row_index]
 
+    def store_guideline_details(self, index: int, errorCode: str, error: str, fix: str, ref: str, level: str, description: str):
+        data = {
+            'Index': index,
+            "Error Code": errorCode,
+            'Error': error,
+            'Fix': fix,
+            'Reference': ref,
+            'Level': level,
+            'Description': description
+        }
+        try:
+            df = pd.DataFrame([data])
+            df.to_csv('guideline_details.csv', mode='a', header=not os.path.exists('guideline_details.csv'), index=False)
+            print("Guideline details saved.")
+        except Exception as e:
+            print(f"Failed to save guideline details: {e}")
 
 gpt_functions = LLMFunctions()
