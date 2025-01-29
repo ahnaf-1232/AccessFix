@@ -1,13 +1,19 @@
 <div class="min-h-screen bg-gradient-to-b from-green-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8"
     ng-controller="EditorController">
     <div class="max-w-7xl mx-auto">
-        <div class="text-center mb-8">
-            <div class="flex justify-center items-center">
-              <img src="assets/logo.png" alt="Logo" class="h-20 w-20"> <!-- Adjust path and size as necessary -->
-              <h1 class="text-4xl font-bold">{{ title }}</h1>
+        <div class="text-center mb-12">
+            <div class="flex justify-center items-center space-x-4">
+                <img src="assets/logo.png" alt="Logo" class="h-20 w-20">
+                <h1 class="text-5xl font-extrabold text-gray-900">
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-blue-600">
+                        AccessFix
+                    </span>
+                </h1>
             </div>
-          </div>
-          
+            <p class="mt-3 text-xl text-gray-600">
+                Improve your code's accessibility and quality with AI-powered analysis
+            </p>
+        </div>
         <div class="bg-white shadow-2xl rounded-lg overflow-hidden">
             <div class="lg:flex">
                 <!-- Input Section -->
@@ -154,90 +160,83 @@
                 </div>
             </div>
         </div>
+
+
         <!-- Guideline Details and Graph Section -->
         <div *ngIf="!loading && report" class="mt-8 lg:flex lg:space-x-8">
-            <div class="mt-8 bg-white shadow-xl rounded-lg py-6 px-8 mb-8 w-full">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-3xl font-bold text-gray-800">Guideline Details</h2>
-                    <button (click)="downloadReport()" 
-                            class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-300 ease-in-out">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-                      </svg>
-                      Download Report
+            <div class="lg:w-2/3 bg-white shadow-xl rounded-lg py-6 px-8 mb-8">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800">Accessibility Guidelines</h2>
+                    <button (click)="downloadReport()"
+                        class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-300 ease-in-out">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20"
+                            fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        Download Report
                     </button>
-                  </div>
-                
-                <div class="space-y-4">
+                </div>
+
+                <div class="space-y-6 h-[600px] overflow-y-auto pr-4">
                     <div *ngFor="let detail of report?.csv_file_path; let i = index"
                         class="bg-white rounded-lg shadow-lg border border-gray-200 guideline-card">
                         <div class="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 transition-colors duration-200"
-                        (click)="toggleCard(i)">
-                     <div class="flex items-center space-x-4 flex-grow">
-                       <span class="px-3 py-1 text-sm font-bold rounded-full shadow-sm" 
-                             [ngClass]="{
-                               'bg-red-100 text-red-800': detail.level === 'A',
-                               'bg-yellow-100 text-yellow-800': detail.level === 'AA',
-                               'bg-blue-100 text-blue-800': detail.level === 'AAA'
-                             }">
-                         {{ detail.level }}
-                       </span>
-                       
-                       <p class="text-gray-700"><b>{{ detail.description }}</b> </p>
-                     </div>
-                     <div class="flex items-center space-x-4">
-                       <span class="text-sm bg-gray-100 text-gray-600 px-3 py-1 rounded-md">{{ detail.reference }}</span>
-                       <svg [ngClass]="{'transform rotate-180': cardStates[i]}" 
-                            class="w-5 h-5 text-gray-500 transition-transform duration-200" 
-                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                       </svg>
-                     </div>
-                   </div>
+                            (click)="toggleCard(i)">
+                            <div class="flex items-center space-x-4 flex-grow">
+                                <span class="px-3 py-1 text-sm font-bold rounded-full shadow-sm" [ngClass]="{
+                                  'bg-red-100 text-red-800': detail.level === 'A',
+                                  'bg-yellow-100 text-yellow-800': detail.level === 'AA',
+                                  'bg-blue-100 text-blue-800': detail.level === 'AAA'
+                                }">
+                                    {{ detail.level }}
+                                </span>
+                                <h3 class="text-lg font-semibold text-gray-700">Violation: {{ detail.description }}</h3>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <span class="text-sm bg-gray-100 text-gray-600 px-3 py-1 rounded-md">Success Criteria: {{ detail.reference
+                                    }}</span>
+                                <svg [ngClass]="{'transform rotate-180': cardStates[i]}"
+                                    class="w-5 h-5 text-gray-500 transition-transform duration-200" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </div>
+                        </div>
                         <div *ngIf="cardStates[i]"
                             class="p-4 border-t border-gray-200 transition-all duration-300 ease-in-out">
                             <div class="space-y-4">
                                 <div>
-                                    <p class="text-sm font-medium text-gray-500 mb-2">Error Code:</p>
+                                    <h4 class="text-md font-medium text-gray-700 mb-2">Code with Violation:</h4>
                                     <pre
                                         class="bg-gray-800 text-green-400 rounded-lg p-4 text-sm overflow-x-auto shadow-inner">{{ detail.errorCode }}</pre>
                                 </div>
                                 <div>
-                                    <p class="text-sm font-medium text-gray-500 mb-2">Fix:</p>
+                                    <h4 class="text-md font-medium text-gray-700 mb-2">Recommended Fix:</h4>
                                     <pre
                                         class="bg-gray-800 text-green-400 rounded-lg p-4 text-sm overflow-x-auto shadow-inner">{{ detail.fix }}</pre>
                                 </div>
                             </div>
                             <div class="mt-6 bg-gray-50 rounded-lg p-4">
-                                <h4 class="text-xl font-semibold text-green-700 mb-2">{{ detail.error }}</h4>
-
+                                <h4 class="text-xl font-semibold text-green-700 mb-2">Guideline:</h4>
+                                <p class="text-gray-600">{{ detail.error }}</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- <div class="mt-8 bg-white shadow-xl rounded-lg py-6 px-8 mb-8">
-                <h2 class="text-3xl font-bold text-gray-800 mb-6">Analysis Charts</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div id="pieChart">
-                        <apx-chart
-                            [series]="pieChartOptions.series"
-                            [chart]="pieChartOptions.chart"
-                            [labels]="pieChartOptions.labels"
-                            [responsive]="pieChartOptions.responsive">
-                        </apx-chart>
-                    </div>
-                    <div id="barChart">
-                        <apx-chart
-                            [series]="barChartOptions.series"
-                            [chart]="barChartOptions.chart"
-                            [xaxis]="barChartOptions.xaxis"
-                            [plotOptions]="barChartOptions.plotOptions"
-                            [responsive]="barChartOptions.responsive">
-                        </apx-chart>
-                    </div>
+            <div class="lg:w-1/3 space-y-8">
+                <div class="bg-white shadow-xl rounded-lg py-6 px-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Errors by Level</h3>
+                    <app-level-errors-chart [data]="levelErrors"></app-level-errors-chart>
                 </div>
-            </div> -->
+                <div class="bg-white shadow-xl rounded-lg py-6 px-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Errors by Type</h3>
+                    <app-type-errors-chart [data]="typeErrors"></app-type-errors-chart>
+                </div>
+            </div>
         </div>
     </div>
 

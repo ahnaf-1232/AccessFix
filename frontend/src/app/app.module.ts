@@ -5,13 +5,17 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './components/home/home.component';
 import { HttpClientModule } from '@angular/common/http';
+import { LevelErrorsChartComponent } from './services/level-errors-chart.component';
+import { TypeErrorsChartComponent } from './services/type-errors-chart.component';
 
 // import { NgApexchartsModule } from 'ng-apexcharts';
 
 @NgModule({
   declarations: [
     AppComponent,
-    HomeComponent
+    HomeComponent,
+    LevelErrorsChartComponent,
+    TypeErrorsChartComponent
   ],
   imports: [
     BrowserModule,

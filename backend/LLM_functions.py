@@ -61,18 +61,18 @@ class LLMFunctions:
             {"role": "user", "content": user}
         ]
         
-        response = openai.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user", "content": user},
-            ],
-        )
-        return response.choices[0].message.content
+        # response = openai.chat.completions.create(
+        #     model="gpt-4o-mini",
+        #     messages=[
+        #         {"role": "system", "content": system},
+        #         {"role": "user", "content": user},
+        #     ],
+        # )
+        # return response.choices[0].message.content
     
-        # response = ollama.chat(model='codegemma:latest', messages=prompt)
-        # content = response['message']['content']        
-        # return content
+        response = ollama.chat(model='qwen2.5-coder:latest', messages=prompt)
+        content = response['message']['content']        
+        return content
 
     def generate_prompt(self, row_index, guideline):
         system_msg = """You are an assistant who will correct web accessibility issues of a provided website.
@@ -130,7 +130,7 @@ class LLMFunctions:
         results = self.collection.query(
             query_embeddings=[response["embedding"]], n_results=3
         )
-        retrieved_data = results["documents"][0][0]  # Assume correct retrieval for simplicity
+        retrieved_data = results["documents"][0][0]  
 
         system_msg, user_msg = self.generate_prompt(row_index, retrieved_data)
         response = self.LLM_response(system_msg, user_msg)
