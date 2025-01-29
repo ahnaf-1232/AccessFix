@@ -1,20 +1,106 @@
 id,impact,tags,description,help,helpUrl,nodeImpact,nodeHtml,nodeTarget,nodeType,numViolation
-document-title,serious,cat.text-alternatives|wcag2a|wcag242|TTv5|TT12.a|EN-301-549|EN-9.2.4.2|ACT,Ensure each HTML document contains a non-empty <title> element,Documents must have <title> element to aid in navigation,https://dequeuniversity.com/rules/axe/4.10/document-title?application=playwright,serious,"<html><head></head><body><p>
- hi
-</p>
-</body></html>",html,any,5
-html-has-lang,serious,cat.language|wcag2a|wcag311|TTv5|TT11.a|EN-301-549|EN-9.3.1.1|ACT,Ensure every HTML document has a lang attribute,<html> element must have a lang attribute,https://dequeuniversity.com/rules/axe/4.10/html-has-lang?application=playwright,serious,"<html><head></head><body><p>
- hi
-</p>
-</body></html>",html,any,5
-landmark-one-main,moderate,cat.semantics|best-practice,Ensure the document has a main landmark,Document should have one main landmark,https://dequeuniversity.com/rules/axe/4.10/landmark-one-main?application=playwright,,"<html><head></head><body><p>
- hi
-</p>
-</body></html>",html,any,5
-page-has-heading-one,moderate,cat.semantics|best-practice,"Ensure that the page, or at least one of its frames contains a level-one heading",Page should contain a level-one heading,https://dequeuniversity.com/rules/axe/4.10/page-has-heading-one?application=playwright,,"<html><head></head><body><p>
- hi
-</p>
-</body></html>",html,any,5
-region,moderate,cat.keyboard|best-practice,Ensure all page content is contained by landmarks,All page content should be contained by landmarks,https://dequeuniversity.com/rules/axe/4.10/region?application=playwright,moderate,"<p>
- hi
-</p>",p,any,5
+color-contrast,serious,cat.color|wcag2aa|wcag143|TTv5|TT13.c|EN-301-549|EN-9.1.4.3|ACT,Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds,Elements must meet minimum color contrast ratio thresholds,https://dequeuniversity.com/rules/axe/4.10/color-contrast?application=playwright,serious,"<a class=""login-btn"" href=""http://www.iit.du.ac.bd/users/login"">
+        Login
+       </a>",li:nth-child(1) > .login-btn,any,8
+color-contrast,serious,cat.color|wcag2aa|wcag143|TTv5|TT13.c|EN-301-549|EN-9.1.4.3|ACT,Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds,Elements must meet minimum color contrast ratio thresholds,https://dequeuniversity.com/rules/axe/4.10/color-contrast?application=playwright,serious,"<a class=""login-btn"" href=""http://www.iit.du.ac.bd/about_iit/faq"">
+        Help
+       </a>",li:nth-child(3) > .login-btn,any,8
+color-contrast,serious,cat.color|wcag2aa|wcag143|TTv5|TT13.c|EN-301-549|EN-9.1.4.3|ACT,Ensure the contrast between foreground and background colors meets WCAG 2 AA minimum contrast ratio thresholds,Elements must meet minimum color contrast ratio thresholds,https://dequeuniversity.com/rules/axe/4.10/color-contrast?application=playwright,serious,"<a href=""mailto:iit@du.ac.bd"">
+        iit@du.ac.bd
+       </a>","a[href$=""mailto:iit@du.ac.bd""]",any,8
+definition-list,serious,cat.structure|wcag2a|wcag131|EN-301-549|EN-9.1.3.1,Ensure <dl> elements are structured correctly,"<dl> elements must only directly contain properly-ordered <dt> and <dd> groups, <script>, <template> or <div> elements",https://dequeuniversity.com/rules/axe/4.10/definition-list?application=playwright,,"<dl class=""dl-horizontal"">",dl,any,8
+image-alt,critical,cat.text-alternatives|wcag2a|wcag111|section508|section508.22.a|TTv5|TT7.a|TT7.b|EN-301-549|EN-9.1.1.1|ACT,Ensure <img> elements have alternate text or a role of none or presentation,Images must have alternate text,https://dequeuniversity.com/rules/axe/4.10/image-alt?application=playwright,critical,"<img src=""http://www.iit.du.ac.bd/assets/img/up.png"" style=""width:51px; height:42px"">",#topcontrol > img,any,8
+landmark-one-main,moderate,cat.semantics|best-practice,Ensure the document has a main landmark,Document should have one main landmark,https://dequeuniversity.com/rules/axe/4.10/landmark-one-main?application=playwright,,"<html lang=""en"" class="" js touch csstransforms csstransitions js cssanimations csstransitions"">",html,any,8
+link-name,serious,cat.name-role-value|wcag2a|wcag244|wcag412|section508|section508.22.a|TTv5|TT6.a|EN-301-549|EN-9.2.4.4|EN-9.4.1.2|ACT,Ensure links have discernible text,Links must have discernible text,https://dequeuniversity.com/rules/axe/4.10/link-name?application=playwright,serious,"<a class=""icon-angle-right"" data-slide=""next"" href=""#testimonal_carousel"">
+       </a>",.icon-angle-right,any,8
+link-name,serious,cat.name-role-value|wcag2a|wcag244|wcag412|section508|section508.22.a|TTv5|TT6.a|EN-301-549|EN-9.2.4.4|EN-9.4.1.2|ACT,Ensure links have discernible text,Links must have discernible text,https://dequeuniversity.com/rules/axe/4.10/link-name?application=playwright,serious,"<a class=""icon-angle-left"" data-slide=""prev"" href=""#testimonal_carousel"">
+       </a>",.icon-angle-left,any,8
+link-name,serious,cat.name-role-value|wcag2a|wcag244|wcag412|section508|section508.22.a|TTv5|TT6.a|EN-301-549|EN-9.2.4.4|EN-9.4.1.2|ACT,Ensure links have discernible text,Links must have discernible text,https://dequeuniversity.com/rules/axe/4.10/link-name?application=playwright,serious,"<a href=""http://www.brainstation-23.com"" target=""_blank"">
+       <img alt="""" src=""http://www.iit.du.ac.bd/assets/img/collaboration/BS_BnW.png"">
+       <img alt="""" class=""color-img"" src=""http://www.iit.du.ac.bd/assets/img/collaboration/BS.png"">
+      </a>","a[href$=""www.brainstation-23.com""]",any,8
+link-name,serious,cat.name-role-value|wcag2a|wcag244|wcag412|section508|section508.22.a|TTv5|TT6.a|EN-301-549|EN-9.2.4.4|EN-9.4.1.2|ACT,Ensure links have discernible text,Links must have discernible text,https://dequeuniversity.com/rules/axe/4.10/link-name?application=playwright,serious,"<a href=""http://www.jantrik.com"" target=""_blank"">
+       <img alt="""" src=""http://www.iit.du.ac.bd/assets/img/collaboration/Jantric_BnW.png"">
+       <img alt="""" class=""color-img"" src=""http://www.iit.du.ac.bd/assets/img/collaboration/Jantric.png"">
+      </a>","a[href$=""www.jantrik.com""]",any,8
+link-name,serious,cat.name-role-value|wcag2a|wcag244|wcag412|section508|section508.22.a|TTv5|TT6.a|EN-301-549|EN-9.2.4.4|EN-9.4.1.2|ACT,Ensure links have discernible text,Links must have discernible text,https://dequeuniversity.com/rules/axe/4.10/link-name?application=playwright,serious,"<a href=""#"">
+       <img alt="""" src=""http://www.iit.du.ac.bd/assets/img/collaboration/4d_BnW.gif"">
+       <img alt=""Four D Communications Ltd."" class=""color-img"" src=""http://www.iit.du.ac.bd/assets/img/collaboration/4d.gif"">
+      </a>",".slides > li:nth-child(3) > a[href=""#""]",any,8
+link-name,serious,cat.name-role-value|wcag2a|wcag244|wcag412|section508|section508.22.a|TTv5|TT6.a|EN-301-549|EN-9.2.4.4|EN-9.4.1.2|ACT,Ensure links have discernible text,Links must have discernible text,https://dequeuniversity.com/rules/axe/4.10/link-name?application=playwright,serious,"<a href=""http://www.bracits.com/"" target=""_blank"">
+       <img alt="""" src=""http://www.iit.du.ac.bd/assets/img/collaboration/bits_BnW.gif"">
+       <img alt="""" class=""color-img"" src=""http://www.iit.du.ac.bd/assets/img/collaboration/bits.gif"">
+      </a>","a[href$=""bracits.com/""]",any,8
+link-name,serious,cat.name-role-value|wcag2a|wcag244|wcag412|section508|section508.22.a|TTv5|TT6.a|EN-301-549|EN-9.2.4.4|EN-9.4.1.2|ACT,Ensure links have discernible text,Links must have discernible text,https://dequeuniversity.com/rules/axe/4.10/link-name?application=playwright,serious,"<a href=""http://selise.ch"" target=""_blank"">
+       <img alt="""" src=""http://www.iit.du.ac.bd/assets/img/collaboration/Selise_BnW.gif"">
+       <img alt="""" class=""color-img"" src=""http://www.iit.du.ac.bd/assets/img/collaboration/Selise.gif"">
+      </a>","a[href$=""selise.ch""]",any,8
+link-name,serious,cat.name-role-value|wcag2a|wcag244|wcag412|section508|section508.22.a|TTv5|TT6.a|EN-301-549|EN-9.2.4.4|EN-9.4.1.2|ACT,Ensure links have discernible text,Links must have discernible text,https://dequeuniversity.com/rules/axe/4.10/link-name?application=playwright,serious,"<a href=""http://kaz.com.bd"" target=""_blank"">
+       <img alt="""" src=""http://www.iit.du.ac.bd/assets/img/collaboration/kaz_BnW.png"">
+       <img alt="""" class=""color-img"" src=""http://www.iit.du.ac.bd/assets/img/collaboration/kaz.png"">
+      </a>","a[href$=""kaz.com.bd""]",any,8
+link-name,serious,cat.name-role-value|wcag2a|wcag244|wcag412|section508|section508.22.a|TTv5|TT6.a|EN-301-549|EN-9.2.4.4|EN-9.4.1.2|ACT,Ensure links have discernible text,Links must have discernible text,https://dequeuniversity.com/rules/axe/4.10/link-name?application=playwright,serious,"<a href=""http://www.orion-informatics.com"" target=""_blank"">
+       <img alt="""" src=""http://www.iit.du.ac.bd/assets/img/collaboration/Orion_BnW.png"">
+       <img alt="""" class=""color-img"" src=""http://www.iit.du.ac.bd/assets/img/collaboration/Orion.png"">
+      </a>","li:nth-child(9) > a[target=""_blank""]",any,8
+link-name,serious,cat.name-role-value|wcag2a|wcag244|wcag412|section508|section508.22.a|TTv5|TT6.a|EN-301-549|EN-9.2.4.4|EN-9.4.1.2|ACT,Ensure links have discernible text,Links must have discernible text,https://dequeuniversity.com/rules/axe/4.10/link-name?application=playwright,serious,"<a href=""http://www.bdpanacea.com"" target=""_blank"">
+       <img alt="""" src=""http://www.iit.du.ac.bd/assets/img/collaboration/Panacea_BnW.png"">
+       <img alt="""" class=""color-img"" src=""http://www.iit.du.ac.bd/assets/img/collaboration/Panacea.png"">
+      </a>","a[href$=""www.bdpanacea.com""]",any,8
+link-name,serious,cat.name-role-value|wcag2a|wcag244|wcag412|section508|section508.22.a|TTv5|TT6.a|EN-301-549|EN-9.2.4.4|EN-9.4.1.2|ACT,Ensure links have discernible text,Links must have discernible text,https://dequeuniversity.com/rules/axe/4.10/link-name?application=playwright,serious,"<a href=""http://www.southtechlimited.com/"" target=""_blank"">
+       <img alt="""" src=""http://www.iit.du.ac.bd/assets/img/collaboration/SouthTech_BnW.png"">
+       <img alt="""" class=""color-img"" src=""http://www.iit.du.ac.bd/assets/img/collaboration/SouthTech.png"">
+      </a>","li:nth-child(11) > a[target=""_blank""]",any,8
+link-name,serious,cat.name-role-value|wcag2a|wcag244|wcag412|section508|section508.22.a|TTv5|TT6.a|EN-301-549|EN-9.2.4.4|EN-9.4.1.2|ACT,Ensure links have discernible text,Links must have discernible text,https://dequeuniversity.com/rules/axe/4.10/link-name?application=playwright,serious,"<a class=""social_facebook"" data-original-title=""Facebook"" href=""https://www.facebook.com/IITatDU"" target=""_blank"">
+        </a>",.social_facebook,any,8
+link-name,serious,cat.name-role-value|wcag2a|wcag244|wcag412|section508|section508.22.a|TTv5|TT6.a|EN-301-549|EN-9.2.4.4|EN-9.4.1.2|ACT,Ensure links have discernible text,Links must have discernible text,https://dequeuniversity.com/rules/axe/4.10/link-name?application=playwright,serious,"<a class=""social_twitter"" data-original-title=""Twitter"" href=""https://twitter.com/iit_du"" target=""_blank"">
+        </a>",.social_twitter,any,8
+link-name,serious,cat.name-role-value|wcag2a|wcag244|wcag412|section508|section508.22.a|TTv5|TT6.a|EN-301-549|EN-9.2.4.4|EN-9.4.1.2|ACT,Ensure links have discernible text,Links must have discernible text,https://dequeuniversity.com/rules/axe/4.10/link-name?application=playwright,serious,"<a class=""social_googleplus"" data-original-title=""Goole Plus"" href=""https://plus.google.com/115652701229065019509/"" target=""_blank"">
+        </a>",.social_googleplus,any,8
+link-name,serious,cat.name-role-value|wcag2a|wcag244|wcag412|section508|section508.22.a|TTv5|TT6.a|EN-301-549|EN-9.2.4.4|EN-9.4.1.2|ACT,Ensure links have discernible text,Links must have discernible text,https://dequeuniversity.com/rules/axe/4.10/link-name?application=playwright,serious,"<a class=""social_pintrest"" data-original-title=""Pinterest"" href=""https://www.pinterest.com/iitdusocial/"" target=""_blank"">
+        </a>",.social_pintrest,any,8
+link-name,serious,cat.name-role-value|wcag2a|wcag244|wcag412|section508|section508.22.a|TTv5|TT6.a|EN-301-549|EN-9.2.4.4|EN-9.4.1.2|ACT,Ensure links have discernible text,Links must have discernible text,https://dequeuniversity.com/rules/axe/4.10/link-name?application=playwright,serious,"<a class=""social_vimeo"" data-original-title=""Vimeo"" href=""http://vimeo.com/user37176171"" target=""_blank"">
+        </a>",.social_vimeo,any,8
+marquee,serious,cat.parsing|wcag2a|wcag222|TTv5|TT2.b|EN-301-549|EN-9.2.2.2,Ensure <marquee> elements are not used,<marquee> elements are deprecated and must not be used,https://dequeuniversity.com/rules/axe/4.10/marquee?application=playwright,,"<marquee onmouseout=""this.start();"" onmouseover=""this.stop();"" style=""color:purple; font-weight: bold; margin-bottom:-8px;"">",marquee,any,8
+page-has-heading-one,moderate,cat.semantics|best-practice,"Ensure that the page, or at least one of its frames contains a level-one heading",Page should contain a level-one heading,https://dequeuniversity.com/rules/axe/4.10/page-has-heading-one?application=playwright,,"<html lang=""en"" class="" js touch csstransforms csstransitions js cssanimations csstransitions"">",html,any,8
+region,moderate,cat.keyboard|best-practice,Ensure all page content is contained by landmarks,All page content should be contained by landmarks,https://dequeuniversity.com/rules/axe/4.10/region?application=playwright,moderate,"<div class=""row-fluid margin-bottom-10"">",.margin-bottom-10.row-fluid:nth-child(1),any,8
+region,moderate,cat.keyboard|best-practice,Ensure all page content is contained by landmarks,All page content should be contained by landmarks,https://dequeuniversity.com/rules/axe/4.10/region?application=playwright,moderate,"<div class=""span6 bg-light"">",.span6,any,8
+region,moderate,cat.keyboard|best-practice,Ensure all page content is contained by landmarks,All page content should be contained by landmarks,https://dequeuniversity.com/rules/axe/4.10/region?application=playwright,moderate,"<div class=""headline"">
+      <h3>
+       Notices
+      </h3>
+     </div>",.span3.bg-light:nth-child(2) > .headline,any,8
+region,moderate,cat.keyboard|best-practice,Ensure all page content is contained by landmarks,All page content should be contained by landmarks,https://dequeuniversity.com/rules/axe/4.10/region?application=playwright,moderate,"<div class=""active item"">",.active.item,any,8
+region,moderate,cat.keyboard|best-practice,Ensure all page content is contained by landmarks,All page content should be contained by landmarks,https://dequeuniversity.com/rules/axe/4.10/region?application=playwright,moderate,"<div class=""span3 bg-light"">",.span3.bg-light:nth-child(3),any,8
+region,moderate,cat.keyboard|best-practice,Ensure all page content is contained by landmarks,All page content should be contained by landmarks,https://dequeuniversity.com/rules/axe/4.10/region?application=playwright,moderate,"<div class=""headline"">
+     <h3>
+      Achievements
+     </h3>
+    </div>",.margin-bottom-40 > .headline,any,8
+region,moderate,cat.keyboard|best-practice,Ensure all page content is contained by landmarks,All page content should be contained by landmarks,https://dequeuniversity.com/rules/axe/4.10/region?application=playwright,moderate,"<div class=""bx-viewport"" style=""width: 100%; overflow: hidden; position: relative; height: 266px;"">",.bx-viewport,any,8
+region,moderate,cat.keyboard|best-practice,Ensure all page content is contained by landmarks,All page content should be contained by landmarks,https://dequeuniversity.com/rules/axe/4.10/region?application=playwright,moderate,"<div class=""bx-controls-direction""><a class=""bx-prev"" href="""">Prev</a><a class=""bx-next"" href="""">Next</a></div>",.bx-controls-direction,any,8
+region,moderate,cat.keyboard|best-practice,Ensure all page content is contained by landmarks,All page content should be contained by landmarks,https://dequeuniversity.com/rules/axe/4.10/region?application=playwright,moderate,"<div class=""headline"">
+     <h3>
+      IIT + Industry Collaboration
+     </h3>
+    </div>",#clients-flexslider > .headline,any,8
+region,moderate,cat.keyboard|best-practice,Ensure all page content is contained by landmarks,All page content should be contained by landmarks,https://dequeuniversity.com/rules/axe/4.10/region?application=playwright,moderate,"<img alt=""Solutions GmbH"" src=""http://www.iit.du.ac.bd/assets/img/collaboration/gmbh_BnW.gif"">","img[alt=""Solutions GmbH""]",any,8
+region,moderate,cat.keyboard|best-practice,Ensure all page content is contained by landmarks,All page content should be contained by landmarks,https://dequeuniversity.com/rules/axe/4.10/region?application=playwright,moderate,"<img alt=""Leads"" src=""http://www.iit.du.ac.bd/assets/img/collaboration/leads_BnW.png"">","img[alt=""Leads""]",any,8
+region,moderate,cat.keyboard|best-practice,Ensure all page content is contained by landmarks,All page content should be contained by landmarks,https://dequeuniversity.com/rules/axe/4.10/region?application=playwright,moderate,"<a class=""pull-right"" href=""http://www.iit.du.ac.bd/home/company_list"">
+    For the complete list of comapies, click here...
+   </a>",body > .container > .pull-right,any,8
+region,moderate,cat.keyboard|best-practice,Ensure all page content is contained by landmarks,All page content should be contained by landmarks,https://dequeuniversity.com/rules/axe/4.10/region?application=playwright,moderate,"<div class=""footer"">",.footer,any,8
+region,moderate,cat.keyboard|best-practice,Ensure all page content is contained by landmarks,All page content should be contained by landmarks,https://dequeuniversity.com/rules/axe/4.10/region?application=playwright,moderate,"<div class=""copyright"">
+   <div class=""container"">
+    <div class=""row-fluid"">
+     <div class=""span8"">
+      <p>
+       2016 © IIT. Developed by BSSE 3rd Batch.
+      </p>
+     </div>
+    </div>
+    <!--/row-fluid-->
+   </div>
+   <!--/container-->
+  </div>",.copyright,any,8
+region,moderate,cat.keyboard|best-practice,Ensure all page content is contained by landmarks,All page content should be contained by landmarks,https://dequeuniversity.com/rules/axe/4.10/region?application=playwright,moderate,"<div id=""topcontrol"" title=""Scroll Back to Top"" style=""position: fixed; bottom: 5px; right: 5px; opacity: 0; cursor: pointer;""><img src=""http://www.iit.du.ac.bd/assets/img/up.png"" style=""width:51px; height:42px""></div>",#topcontrol,any,8

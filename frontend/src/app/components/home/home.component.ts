@@ -5,6 +5,7 @@ import { HttpClient } from "@angular/common/http"
 import { trigger, transition, style, animate } from "@angular/animations"
 
 
+
 @Component({
   selector: "app-home",
   templateUrl: "./home.component.html",
@@ -34,6 +35,10 @@ export class HomeComponent {
   userInput = ""
   cardStates: boolean[] = []
 
+  levelErrors: { level: string; count: number }[] = []
+  typeErrors: { type: string; count: number }[] = []
+
+
   constructor(
     private codeAnalysisService: AnalysisService,
     private http: HttpClient,
@@ -41,16 +46,33 @@ export class HomeComponent {
   }
 
 
+  processAnalysisData() {
+    if (this.report && this.report.csv_file_path) {
+      // Process level errors
+      const levelCounts: { [key in 'A' | 'AA' | 'AAA']: number } = { A: 0, AA: 0, AAA: 0 }
+      this.report.csv_file_path.forEach((detail) => {
+        if (levelCounts.hasOwnProperty(detail.level)) {
+          levelCounts[detail.level as 'A' | 'AA' | 'AAA']++
+        }
+      })
+      this.levelErrors = Object.entries(levelCounts).map(([level, count]) => ({ level, count }))
 
+      // Process type errors
+      const typeCounts: { [key: string]: number } = {}
+      this.report.csv_file_path.forEach((detail) => {
+        const type = detail.reference.split(".")[0]
+        typeCounts[type] = (typeCounts[type] || 0) + 1
+      })
+      this.typeErrors = Object.entries(typeCounts).map(([type, count]) => ({ type, count: count as number }))
+    }
+  }
 
 
 
 
   toggleCard(index: number) {
     this.cardStates[index] = !this.cardStates[index]
-  }
-
-  
+  }  
 
   copyCodeToClipboard() {
     if (this.report && this.report.corrected_html) {
@@ -74,10 +96,9 @@ export class HomeComponent {
     if (this.code) {
       this.codeAnalysisService.analyzeCode(this.code).subscribe(
         (response) => {
-          console.log("Received response:", response)
           this.report = response
-          console.log(this.report?.csv_file_path)
           this.loading = false
+          this.processAnalysisData() 
         },
         (error) => {
           console.error("Error during code analysis:", error)
@@ -90,6 +111,7 @@ export class HomeComponent {
           this.report = response
           // this.clearFields();
           this.loading = false
+          this.processAnalysisData() 
         },
         (error) => {
           this.errorMessage = "Error analyzing URL."
@@ -105,6 +127,7 @@ export class HomeComponent {
           this.report = response
           // this.clearFields();
           this.loading = false
+          this.processAnalysisData() 
         },
         (error) => {
           this.errorMessage = "Error analyzing file."
