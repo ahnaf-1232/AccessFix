@@ -222,7 +222,6 @@ class CleanGPTModels:
 
                 fix = self.gpt_functions.get_correction(index)
                 if fix:
-                    # Check if the fix is surrounded by single quotes and remove them
                     fix = fix.strip("'")
                     # print(f"Fix for error {index}: {fix}\n")
                     if error and fix and error != fix:
@@ -230,7 +229,6 @@ class CleanGPTModels:
 
             # Apply all collected fixes
             for error, fix in error_fix_dict.items():
-                # Direct replacement without re-parsing the content
                 dom = dom.replace(error, fix)
                 # print(f"Applying fix: {error}  --> {fix}\n")
 
@@ -248,7 +246,7 @@ class CleanGPTModels:
             os.makedirs('data', exist_ok=True)
             with open(corrected_path, 'w', encoding='utf-8') as corrected_file:
                 corrected_file.write(corrected_dom)
-            print(f"Corrected DOM saved to {corrected_path}")
+            # print(f"Corrected DOM saved to {corrected_path}")
 
         except Exception as e:
             print(f"Critical error in create_corrected_dom_column: {e}")
@@ -319,7 +317,7 @@ class CleanGPTModels:
                 for i in range(length):
                     file_path = f"data{i}.json"
                     if os.path.exists(file_path):
-                        with open(file_path, "r") as file:
+                        with open(file_path, "r", encoding='utf-8') as file:
                             df_temp = pd.read_json(file, lines=True)
                         df_temp = df_temp.reset_index(drop=True)
                         new_df = pd.concat([new_df, df_temp], ignore_index=True)
@@ -342,7 +340,7 @@ class CleanGPTModels:
                 new_df = pd.concat([new_df, df_temp], ignore_index=True)
         except Exception as e:
             print(f"Error processing violation data: {e}")
-            return pd.DataFrame()  # Return an empty DataFrame or handle as needed
+            return pd.DataFrame()
 
         try:
             self.remove_files_starting_with("data*")
@@ -391,6 +389,12 @@ class CleanGPTModels:
                 corrected_html = f.read()
                 
         csv_file_path = os.path.join('data', 'guideline_details.csv')
+        
+        if os.path.exists(csv_file_path):
+            csv_data = pd.read_csv(csv_file_path)
+            csv_content = csv_data.to_dict(orient='records')
+        else:
+            csv_content = [] 
 
         # print(f"Total initial severity score: {total_initial_severity_score}")
         # print(f"Total final severity score: {total_final_severity_score}")
@@ -402,7 +406,7 @@ class CleanGPTModels:
             "total_final_severity_score": int(total_final_severity_score) if isinstance(total_final_severity_score, np.integer) else total_final_severity_score,
             "total_improvement": float(total_improvement) if isinstance(total_improvement, (np.integer, np.floating)) else total_improvement,
             "corrected_html": corrected_html,
-            "csv_file_path": csv_file_path
+            "csv_file_path": csv_content
 
         }
     
